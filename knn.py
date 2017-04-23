@@ -4,7 +4,7 @@
 # mail: jin.li@vub.ac.be; homtingli@gmail.com
 # Created Time: 2017-04-21 21:20:47
 import math
-import operator
+from operator import itemgetter
 from random import random
 from readData import readData
 
@@ -57,6 +57,7 @@ class knn():
 
 
     # get K near neighborhoods
+    # 获取还有点问题, 字典会导致数据缺失
     def getKNearNeighbors(self, trainSet, testInstance, n):
         distances = []
         neighbors = []
@@ -68,9 +69,9 @@ class knn():
             distances.append((trainSet[i],dist))
             dis.setdefault(tuple(trainSet[i]),dist)
 
-        distances.sort(key=operator.itemgetter(1))
+        distances.sort(key=itemgetter(1))
 
-        temp = sorted(dis.items(),key=operator.itemgetter(1))
+        temp = sorted(dis.items(),key=itemgetter(1))
 
         for i in range(n):
             neighbors.append(distances[i][0])
@@ -84,19 +85,18 @@ class knn():
                 print(temp[i][1])
                 print(len(temp))
                 print()
-        return n2
+        return n2  #使用 neighbors最好
 
 
-    def getResponse(self, neighbors):
-        classVotes = {}
+    def getResult(self, neighbors):
+        dic = {}
         for i in range(len(neighbors)):
-            response = neighbors[i][-1]
-            if response in classVotes:
-                classVotes[response] += 1
-            else:
-                classVotes[response] = 1
-        sortedVotes = sorted(classVotes.items(),key=operator.itemgetter(1),reverse=True)
-        return sortedVotes[0][0]
+            response = neighbors[i][-1]   # result
+            dic.setdefault(response,dic.get(response,0)+1)
+        temp = sorted(dic.items(),key=itemgetter(1))
+        temp.reverse()
+        #最近的几个instances 来得到最大的结果, 值最大,说明靠的近,选大的
+        return temp[0][0]
 
 
     def getAccuracy(self, testSet, predictions):
@@ -112,10 +112,11 @@ class knn():
         predictions = []
         for i in range(len(self.__testSet)):
             neighbors = self.getKNearNeighbors(self.__trainSet,self.__testSet[i],self.__k)
-            result = self.getResponse(neighbors)
+            result = self.getResult(neighbors)
             predictions.append(result)
         #print(result)
         accuracy = self.getAccuracy(self.__testSet,predictions)
         print((accuracy))
 
 k = knn("iris.txt",0.7,3)
+
