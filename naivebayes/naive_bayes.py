@@ -13,6 +13,10 @@ class Naive_bayes(object):
     __trainSet = []
     __testSet = []
 
+    __px={}
+    __pc={}
+    __pxc={}
+
     def __init__(self, filename, split):
         self.__filename = filename
         f = readData(self.__filename)
@@ -48,18 +52,36 @@ class Naive_bayes(object):
             print(i)
 
     def train(self):
+        self.count_pc()
+        self.count_px()
+        self.count_pcx()
+
+    def predict(self):
         pass
 
-    def gauss_dist(self, mu, sigma, x):
+    def count_px(self):
+        for i in self.__trainSet[:-1]:
+            if i not in self.__px.keys():
+                self.__px[i] = 1
+            else:
+                self.__px[i] += 1
 
-        return
+    def count_pc(self):
+        for i in self.__trainSet[-1]:
+            if i not in self.__pc.keycs():
+                self.__pc[i] = 1
+            else:
+                self.__pc[i] += 1
+    def count_pcx(self):
+        for i in self.__trainSet:
+            if i not in self.__pc.keycs():
+                self.__pcx[i] = 1
+            else:
+                self.__pcx[i] += 1
 
 
-
-
-
-
-
+car_naive = Naive_bayes("./txtfile/car_prepro.txt",0.7)
+print(car_naive.getAttributes())
 
 
 

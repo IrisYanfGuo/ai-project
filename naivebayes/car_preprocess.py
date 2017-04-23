@@ -8,7 +8,7 @@ for i in 'vhigh,high,med,low'.strip().split(','):
     dict_translate[i] = t
     t -= 1
 # deal with third attritube
-dict_translate['5-more'] = 5
+dict_translate['5more'] = 5
 # deal with 4 attritube
 dict_translate['more'] = 5
 # deal with 5th attri
@@ -33,12 +33,12 @@ car_attr,car_ins = car.readDataSet()
 f = open('./txtfile/car_prepro.txt','w')
 f.write("@data car after preprocess\n\n")
 for i in car_attr:
-    f.write("@"+i+'\n')
+    f.write("@attr "+i+'\n')
+f.write("@class Play\n")
+
 f.write('\n')
 
-print(dict_translate)
 for i in car_ins:
-    print(i)
     for j in i:
         if j in dict_translate.keys():
             f.write(str(dict_translate[j])+',')
