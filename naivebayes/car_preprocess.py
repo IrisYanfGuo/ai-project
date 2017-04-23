@@ -39,11 +39,15 @@ f.write("@class Play\n")
 f.write('\n')
 
 for i in car_ins:
-    for j in i:
+    for j in i[:-1]:
         if j in dict_translate.keys():
             f.write(str(dict_translate[j])+',')
         else:
             f.write(j+',')
+    if i[-1] in dict_translate.keys():
+        f.write(str(dict_translate[j]))
+    else:
+        f.write(j)
     f.write('\n')
 f.close()
 
