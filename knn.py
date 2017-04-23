@@ -117,6 +117,3 @@ class knn():
         #print(result)
         accuracy = self.getAccuracy(self.__testSet,predictions)
         print(accuracy)
-
-k = knn("iris.txt",0.7,3)
-
