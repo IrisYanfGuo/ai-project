@@ -5,125 +5,117 @@
 # Created Time: 2017-04-21 21:20:47
 import math
 import operator
-import random
+from random import random
 from readData import readData
 
-attributes = []
-instances = []
 
-#read data set from file
-def readDataSet():
-    global attributes,instances
+class knn():
+    __attributes = []
+    __instances = []
+    __trainSet = []
+    __testSet = []
 
-    #f = open("data.txt")
-    #f = open("qqqqq.arff")
-    #f = open('car.txt')
-    f = open('iris.txt')
-    line = f.readline()
-    while line:
-        line = line.strip()
-        if line.startswith("@attr") or line.startswith("@ATTR"):
-            attributes.append(line.split()[1])
-        if not line.startswith("@") and len(line)>1:
-            instances.append(line.strip().split(","))
-        line = f.readline()
-    f.close()
-    print(attributes)
+    # read data set
+    def __init__(self, filename, split):
+        self.__filename = filename
+        f = readData(self.__filename)
+        self.__attributes,self.__instances = f.readDataSet()
+        self.__trainSet,self.__testSet = self.splitDataSet(split)
+        self.getPrediction()
 
-
-#readDataSet()
-
-def vectorDistance(data1, data2,length):
-	distance = 0
-	for x in range(length):
-		distance += pow((data1[x] - data2[x]),2)
-	return math.sqrt(distance)
+    # divide dataset into training and testing dataset
+    def splitDataSet(self,split):
+        trainSet = []
+        testSet = []
+        for x in range(len(self.__instances)):
+            for y in range(len(self.__attributes)):
+                self.__instances[x][y] = float(self.__instances[x][y])
+            if random() <= split:
+                trainSet.append(self.__instances[x])
+            else:
+                testSet.append(self.__instances[x])
+        return trainSet, testSet
 
 
-#data1 = [2,2,2,'a']
-#data2 = [4,4,4,'b']
-#distance = vectorDistance(data1,data2,3)
-#print('Distance',end=" ")
-#print(distance)
+    #get attributes
+    def getAttributes(self):
+        return self.__attributes
+    #get instances
+    def getInstances(self):
+        return self.__instances
 
-def getNeighbors(trainSet, testInstance, k):
-	distances = []
-	length = len(testInstance) -1
-	for x in range(len(trainSet)):
-		dist = vectorDistance(testInstance,trainSet[x],length)
-		distances.append((trainSet[x],dist))
-	distances.sort(key=operator.itemgetter(1))
-	neighbors = []
-	for x in range(k):
-		neighbors.append(distances[x][0])
-	return neighbors
+    # to calculate the Euclidean distance
+    def getEuclideanDistance(self, data1, data2):
+        distance = 0
+        for x in range(len(data1)-1):
+            distance += pow((data1[x] - data2[x]),2)
+        return math.sqrt(distance)
 
-#trainSet = [[2,2,2,'a'],[4,4,4,'b'],[5,4,4,'c']]
-#testInstance = [5,5,5]
-#k = 1
-#neighbors = getNeighbors(trainSet,testInstance,k)
-#print(neighbors)
 
-def getResponse(neighbors):
-	classVotes = {}
-	for x in range(len(neighbors)):
-		response = neighbors[x][-1]
-		if response in classVotes:
-			classVotes[response] += 1
-		else:
-			classVotes[response] = 1
-	sortedVotes = sorted(classVotes.items(),key=operator.itemgetter(1),reverse=True)
-	return sortedVotes[0][0]
+    def getKNearNeighbors(self, trainSet, testInstance, n):
+        distances = []
+        neighbors = []
+        n2 = []
+        dis = {}
 
-#neighbors = [[1,1,1,'a'],[2,2,2,'a'],[3,3,3,'c']]
-#response = getResponse(neighbors)
-#print(response)
+        for x in range(len(trainSet)):
+            dist = self.getEuclideanDistance(testInstance,trainSet[x])
+            distances.append((trainSet[x],dist))
+            dis.setdefault(tuple(trainSet[x]),dist)
 
-def getAccuracy(testSet, predictions):
-	correct = 0
-	for x in range(len(testSet)):
-		if testSet[x][-1] == predictions[x]:
-			correct += 1
-	print(correct)
-	return (correct/float(len(testSet))) *100.0
+        distances.sort(key=operator.itemgetter(1))
 
-#testSet = [[1,1,1,'a'],[2,2,2,'a'],[3,3,3,'b']]
-#predictions = ['a','a','a']
-#accuracy = getAccuracy(testSet,predictions)
-#print(accuracy)
+        temp = sorted(dis.items(),key=operator.itemgetter(1))
 
-def main():
-	trainSet = []
-	testSet = []
-	split = 0.66
-	readDataSet()
+        for x in range(n):
+            neighbors.append(distances[x][0])
+            n2.append(list(temp[x][0]))
 
-	for x in range(len(instances)):
-		for y in range(len(attributes)):
-			#print(instances[x][y])
-			#print(len(attributes))
-			instances[x][y] = float(instances[x][y])
-		if random.random() < split:
-			trainSet.append(instances[x])
-		else:
-			testSet.append(instances[x])
-
-	predictions = []
-	k = 3
-	for x in range(len(testSet)):
-		neighbors = getNeighbors(trainSet,testSet[x],k)
-		result = getResponse(neighbors)
-		predictions.append(result)
-		#print(result)
-
-	accuracy = getAccuracy(testSet,predictions)
-	print((accuracy))
-
-main()
+            if (neighbors!=n2):
+                print(neighbors,end=",")
+                print(distances[x][1])
+                print(len(distances))
+                print(n2,end=",")
+                print(temp[x][1])
+                print(len(temp))
+                print()
+        return neighbors
 
 
 
+    def getResponse(self, neighbors):
+        classVotes = {}
+        for x in range(len(neighbors)):
+            response = neighbors[x][-1]
+            if response in classVotes:
+                classVotes[response] += 1
+            else:
+                classVotes[response] = 1
+        sortedVotes = sorted(classVotes.items(),key=operator.itemgetter(1),reverse=True)
+        return sortedVotes[0][0]
 
 
+    def getAccuracy(self, testSet, predictions):
+        correct = 0
+        for x in range(len(testSet)):
+            if testSet[x][-1] == predictions[x]:
+                correct += 1
+        #print(correct)
+        return (correct/float(len(testSet))) *100.0
 
+
+    def getPrediction(self):
+
+        predictions = []
+        k = 3
+        for x in range(len(self.__testSet)):
+            neighbors = self.getKNearNeighbors(self.__trainSet,self.__testSet[x],k)
+            result = self.getResponse(neighbors)
+            predictions.append(result)
+        #print(result)
+
+        accuracy = self.getAccuracy(self.__testSet,predictions)
+        print((accuracy))
+
+k = knn("iris.txt",0.66)
 
