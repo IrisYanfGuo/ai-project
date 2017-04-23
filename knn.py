@@ -14,10 +14,12 @@ class knn():
     __instances = []
     __trainSet = []
     __testSet = []
+    __k = 3
 
     # read data set
-    def __init__(self, filename, split):
+    def __init__(self, filename, split,k):
         self.__filename = filename
+        self.__k = k
         f = readData(self.__filename)
         self.__attributes,self.__instances = f.readDataSet()
         self.__trainSet,self.__testSet = self.splitDataSet(split)
@@ -27,13 +29,15 @@ class knn():
     def splitDataSet(self,split):
         trainSet = []
         testSet = []
-        for x in range(len(self.__instances)):
-            for y in range(len(self.__attributes)):
-                self.__instances[x][y] = float(self.__instances[x][y])
+        for i in range(len(self.__instances)):
+            for j in range(len(self.__attributes)):
+                self.__instances[i][j] = float(self.__instances[i][j])
+
+        for i in range(len(self.__instances)):
             if random() <= split:
-                trainSet.append(self.__instances[x])
+                trainSet.append(self.__instances[i])
             else:
-                testSet.append(self.__instances[x])
+                testSet.append(self.__instances[i])
         return trainSet, testSet
 
 
@@ -46,47 +50,47 @@ class knn():
 
     # to calculate the Euclidean distance
     def getEuclideanDistance(self, data1, data2):
-        distance = 0
+        d = 0.0
         for x in range(len(data1)-1):
-            distance += pow((data1[x] - data2[x]),2)
-        return math.sqrt(distance)
+            d += pow((data1[x] - data2[x]),2)
+        return math.sqrt(d)
 
 
+    # get K near neighborhoods
     def getKNearNeighbors(self, trainSet, testInstance, n):
         distances = []
         neighbors = []
         n2 = []
         dis = {}
 
-        for x in range(len(trainSet)):
-            dist = self.getEuclideanDistance(testInstance,trainSet[x])
-            distances.append((trainSet[x],dist))
-            dis.setdefault(tuple(trainSet[x]),dist)
+        for i in range(len(trainSet)):
+            dist = self.getEuclideanDistance(testInstance,trainSet[i])
+            distances.append((trainSet[i],dist))
+            dis.setdefault(tuple(trainSet[i]),dist)
 
         distances.sort(key=operator.itemgetter(1))
 
         temp = sorted(dis.items(),key=operator.itemgetter(1))
 
-        for x in range(n):
-            neighbors.append(distances[x][0])
-            n2.append(list(temp[x][0]))
+        for i in range(n):
+            neighbors.append(distances[i][0])
+            n2.append(list(temp[i][0]))
 
             if (neighbors!=n2):
                 print(neighbors,end=",")
-                print(distances[x][1])
+                print(distances[i][1])
                 print(len(distances))
                 print(n2,end=",")
-                print(temp[x][1])
+                print(temp[i][1])
                 print(len(temp))
                 print()
-        return neighbors
-
+        return n2
 
 
     def getResponse(self, neighbors):
         classVotes = {}
-        for x in range(len(neighbors)):
-            response = neighbors[x][-1]
+        for i in range(len(neighbors)):
+            response = neighbors[i][-1]
             if response in classVotes:
                 classVotes[response] += 1
             else:
@@ -97,25 +101,21 @@ class knn():
 
     def getAccuracy(self, testSet, predictions):
         correct = 0
-        for x in range(len(testSet)):
-            if testSet[x][-1] == predictions[x]:
+        for i in range(len(testSet)):
+            if testSet[i][-1] == predictions[i]:
                 correct += 1
         #print(correct)
         return (correct/float(len(testSet))) *100.0
 
 
     def getPrediction(self):
-
         predictions = []
-        k = 3
-        for x in range(len(self.__testSet)):
-            neighbors = self.getKNearNeighbors(self.__trainSet,self.__testSet[x],k)
+        for i in range(len(self.__testSet)):
+            neighbors = self.getKNearNeighbors(self.__trainSet,self.__testSet[i],self.__k)
             result = self.getResponse(neighbors)
             predictions.append(result)
         #print(result)
-
         accuracy = self.getAccuracy(self.__testSet,predictions)
         print((accuracy))
 
-k = knn("iris.txt",0.66)
-
+k = knn("iris.txt",0.7,3)
