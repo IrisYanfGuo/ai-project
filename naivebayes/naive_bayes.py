@@ -4,6 +4,9 @@ import math
 import operator
 from random import random
 
+
+# iris, continuous variables
+# car, discrete variables
 class Naive_bayes(object):
     __attributes = []
     __instances = []
@@ -13,8 +16,8 @@ class Naive_bayes(object):
     def __init__(self, filename, split):
         self.__filename = filename
         f = readData(self.__filename)
-        self.__attributes,self.__instances = f.readDataSet()
-        self.__trainSet,self.__testSet = self.splitDataSet(split)
+        self.__attributes, self.__instances = f.readDataSet()
+        self.__trainSet, self.__testSet = self.splitDataSet(split)
 
     # divide dataset into training and testing dataset
     def splitDataSet(self, split):
@@ -39,16 +42,25 @@ class Naive_bayes(object):
     def printTestset(self):
         for i in self.__testSet:
             print(i)
+
     def printTrainset(self):
         for i in self.__trainSet:
             print(i)
 
-
     def train(self):
         pass
 
-    def px(self):
-        pass
+    def gauss_dist(self, mu, sigma, x):
+
+        return
+
+
+
+
+
+
+
+
 
 
 
