@@ -47,7 +47,7 @@ class readData(object):
 #print(attr)
 #print(repr(ins))
 
-r = readData("sun.txt")
-attr,ins = r.readDataSet()
-print(attr)
+#r = readData("sun.txt")
+#attr,ins = r.readDataSet()
+#print(attr)
 
