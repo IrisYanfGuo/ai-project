@@ -40,6 +40,14 @@ class readData(object):
 
         return self.__attributes,self.__instances
 
+    def print_attri(self):
+        for i in self.__attributes:
+            print(i)
+
+    def print_ins(self):
+        for i in self.__instances:
+            print(i)
+
 
 #attr,ins = readDataSet("qqqqq.txt")
 #attr,ins = readDataSet("data.txt")
