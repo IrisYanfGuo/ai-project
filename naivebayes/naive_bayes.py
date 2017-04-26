@@ -8,16 +8,20 @@ from random import random
 # iris, continuous variables
 # car, discrete variables
 class Naive_bayes(object):
-    __attributes = []
-    __instances = []
-    __trainSet = []
-    __testSet = []
 
-    __pc = {}
-    __px = []
-    __pxc = {}
 
     def __init__(self, filename, split):
+
+        self.__attributes = []
+        self.__instances = []
+        self.__trainSet = []
+        self.__testSet = []
+
+        self.__pc = {}
+        self.__px = []
+        self.__pxc = {}
+
+
         self.__filename = filename
         f = readData(self.__filename)
         self.__attributes, self.__instances = f.readDataSet()
