@@ -44,10 +44,7 @@ for i in car_ins:
             f.write(str(dict_translate[j])+',')
         else:
             f.write(j+',')
-    if i[-1] in dict_translate.keys():
-        f.write(str(dict_translate[j]))
-    else:
-        f.write(j)
+    f.write(str(dict_translate[i[-1]]))
     f.write('\n')
 f.close()
 

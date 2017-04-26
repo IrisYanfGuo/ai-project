@@ -13,15 +13,17 @@ class Naive_bayes(object):
     __trainSet = []
     __testSet = []
 
-    __px={}
-    __pc={}
-    __pxc={}
+    __pc = {}
+    __px = []
+    __pxc = {}
 
     def __init__(self, filename, split):
         self.__filename = filename
         f = readData(self.__filename)
         self.__attributes, self.__instances = f.readDataSet()
         self.__trainSet, self.__testSet = self.splitDataSet(split)
+        self.train()
+        self.getPrediction()
 
     # divide dataset into training and testing dataset
     def splitDataSet(self, split):
@@ -29,7 +31,7 @@ class Naive_bayes(object):
         testSet = []
         for x in range(len(self.__instances)):
             for y in range(len(self.__attributes)):
-                self.__instances[x][y] = float(self.__instances[x][y])
+                self.__instances[x][y] = self.__instances[x][y]
             if random() <= split:
                 trainSet.append(self.__instances[x])
             else:
@@ -51,39 +53,84 @@ class Naive_bayes(object):
         for i in self.__trainSet:
             print(i)
 
-    def train(self):
-        self.count_pc()
-        self.count_px()
-        self.count_pcx()
+    def count(self, list):
+        dict = {}
+        for i in list:
+            if i not in dict.keys():
+                dict[i] = 1
+            else:
+                dict[i] += 1
 
-    def predict(self):
-        pass
+        return dict
 
     def count_px(self):
-        for i in self.__trainSet[:-1]:
-            if i not in self.__px.keys():
-                self.__px[i] = 1
-            else:
-                self.__px[i] += 1
+        for i in range(len(self.__attributes)):
+            temp = [self.__trainSet[j][i] for j in range(len(self.__trainSet))]
+            tdict = self.count(temp)
+            self.__px.append(tdict)
 
     def count_pc(self):
-        for i in self.__trainSet[-1]:
-            if i not in self.__pc.keycs():
-                self.__pc[i] = 1
-            else:
-                self.__pc[i] += 1
-    def count_pcx(self):
-        for i in self.__trainSet:
-            if i not in self.__pc.keycs():
-                self.__pcx[i] = 1
-            else:
-                self.__pcx[i] += 1
+        tag = [self.__trainSet[i][-1] for i in range(len(self.__trainSet))]
+        self.__pc = self.count(tag)
+
+    def count_pxc(self):
+        for i in range(len(self.__trainSet)):
+            for j in range(len(self.__attributes)):
+                self.__pxc[self.__trainSet[i][-1]][j][self.__trainSet[i][j]] += 1
+
+    def train(self):
+        self.count_px()
+        self.count_pc()
+        for i in self.__pc.keys():
+            t = []
+            for j in range(len(self.__attributes)):
+                tdict = {}
+                for k in self.__px[j].keys():
+                    tdict[k] = 1
+                t.append(tdict)
+            self.__pxc[i] = t
+
+            # 初值为1, 防止不存在键的情况
+
+        self.count_pxc()
+
+    def predict(self, blist):
+        result = {}
+        for i in self.__pc.keys():
+            pxc = 1
+            px = 1
+            for j in range(len(self.__attributes)):
+                pxc *= self.__pxc[i][j][blist[j]] / self.__pc[i]
+                px *= self.__px[j][blist[j]] / len(self.__trainSet)
+
+            result[i] = pxc * self.__pc[i] / len(self.__trainSet) / px
+
+        largest = max(result.values())
+
+        for i in self.__pc.keys():
+            if result[i] == largest:
+                t = i
+        return t
+
+    def getAccuracy(self, testSet, predictions):
+        correct = 0
+        for i in range(len(testSet)):
+            if testSet[i][-1] == predictions[i]:
+                correct += 1
+        # print(correct)
+        return (correct / float(len(testSet))) * 100.0
+
+    def getPrediction(self):
+        predictions = []
+        for i in self.__testSet:
+            result = self.predict(i)
+            predictions.append(result)
+
+        # print(result)
+        accuracy = self.getAccuracy(self.__testSet, predictions)
+        print(accuracy)
 
 
-car_naive = Naive_bayes("./txtfile/car_prepro.txt",0.7)
-print(car_naive.getAttributes())
-
-
-
-
-
+car_naive = Naive_bayes("./txtfile/car_prepro.txt", 0.5)
+car_naive = Naive_bayes("./txtfile/car_prepro.txt", 0.5)
+#car_naive2 = Naive_bayes("../car.txt", 0.5)
