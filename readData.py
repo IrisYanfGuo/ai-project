@@ -7,26 +7,21 @@
 class readData(object):
     """docstring for readData"""
 
-    #use attributes to store attributes
-    #use instances to store instances
-    __attributes = []
-    __instances = []
-    __filename = ""
+    # use attributes to store attributes
+    # use instances to store instances
 
     def __init__(self, filename):
         print("start reading dataSet")
         self.__filename = filename
-        self.__attributes=[]
-        self.__instances=[]
 
+        self.__attributes = []
+        self.__instances = []
 
-
-    #read data set from dataset file
+    # read data set from dataset file
 
     def readDataSet(self):
-        
 
-        #open dataset file to read data set
+        # open dataset file to read data set
         try:
             f = open(self.__filename)
             line = f.readline()
@@ -34,7 +29,7 @@ class readData(object):
                 line = line.strip()
                 if line.startswith("@attr") or line.startswith("@ATTR"):
                     self.__attributes.append(line.split()[1])
-                if not line.startswith("@") and len(line)>2:
+                if not line.startswith("@") and len(line) > 2:
                     self.__instances.append(line.strip().split(","))
                 line = f.readline()
             f.close()
@@ -42,7 +37,7 @@ class readData(object):
         except Exception as e:
             print("open file error")
 
-        return self.__attributes,self.__instances
+        return self.__attributes, self.__instances
 
     def printAttri(self):
         for i in self.__attributes:
@@ -53,13 +48,11 @@ class readData(object):
             print(i)
 
 
-
-
-#attr,ins = readDataSet("iris.txt")
-#attr,ins = readDataSet("data.txt")
-#attr,ins = readDataSet("sun.txt")
-#print(attr)
-#print(repr(ins))
+# attr,ins = readDataSet("iris.txt")
+# attr,ins = readDataSet("data.txt")
+# attr,ins = readDataSet("sun.txt")
+# print(attr)
+# print(repr(ins))
 
 '''
 r = readData("iris.txt")
