@@ -51,13 +51,22 @@ class readData(object):
 
 
 
-#attr,ins = readDataSet("qqqqq.txt")
+#attr,ins = readDataSet("iris.txt")
 #attr,ins = readDataSet("data.txt")
 #attr,ins = readDataSet("sun.txt")
 #print(attr)
 #print(repr(ins))
 
-#r = readData("sun.txt")
-#attr,ins = r.readDataSet()
+r = readData("iris.txt")
+attr,ins = r.readDataSet()
+print(len(ins))
+
+r2 = readData("iris.txt")
+attr,ins = r.readDataSet()
+print(len(ins))
+
+r3 = readData("iris.txt")
+attr,ins = r.readDataSet()
+print(len(ins))
 #print(attr)
 

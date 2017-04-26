@@ -130,5 +130,6 @@ class Naive_bayes(object):
 
 
 car_naive = Naive_bayes("./txtfile/car_prepro.txt", 0.5)
-#car_naive2 = Naive_bayes("./txtfile/car_prepro.txt", 0.5)
+
+car_naive2 = Naive_bayes("./txtfile/car_prepro.txt", 0.5)
 #car_naive2 = Naive_bayes("../car.txt", 0.5)
