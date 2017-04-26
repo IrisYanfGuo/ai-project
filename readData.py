@@ -16,6 +16,10 @@ class readData(object):
     def __init__(self, filename):
         print("start reading dataSet")
         self.__filename = filename
+        self.__attributes=[]
+        self.__instances=[]
+
+
 
     #read data set from dataset file
 
@@ -57,16 +61,16 @@ class readData(object):
 #print(attr)
 #print(repr(ins))
 
+'''
 r = readData("iris.txt")
-attr,ins = r.readDataSet()
-print(len(ins))
 
 r2 = readData("iris.txt")
-attr,ins = r.readDataSet()
+attr,ins = r2.readDataSet()
 print(len(ins))
 
 r3 = readData("iris.txt")
-attr,ins = r.readDataSet()
+attr,ins = r3.readDataSet()
 print(len(ins))
 #print(attr)
 
+'''
