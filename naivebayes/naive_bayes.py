@@ -30,8 +30,6 @@ class Naive_bayes(object):
         trainSet = []
         testSet = []
         for x in range(len(self.__instances)):
-            for y in range(len(self.__attributes)):
-                self.__instances[x][y] = self.__instances[x][y]
             if random() <= split:
                 trainSet.append(self.__instances[x])
             else:
@@ -132,5 +130,5 @@ class Naive_bayes(object):
 
 
 car_naive = Naive_bayes("./txtfile/car_prepro.txt", 0.5)
-car_naive = Naive_bayes("./txtfile/car_prepro.txt", 0.5)
+#car_naive2 = Naive_bayes("./txtfile/car_prepro.txt", 0.5)
 #car_naive2 = Naive_bayes("../car.txt", 0.5)
