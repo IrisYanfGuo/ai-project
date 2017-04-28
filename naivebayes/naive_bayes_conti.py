@@ -161,4 +161,5 @@ class Naive_bayes_conti(object):
         print(accuracy)
 
 
-iris = Naive_bayes_conti("../iris.txt",0.5)
+for i in range(100):
+    iris = Naive_bayes_conti("../iris.txt",0.92)

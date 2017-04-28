@@ -117,6 +117,3 @@ class knn():
         #print(result)
         accuracy = self.getAccuracy(self.__testSet,predictions)
         print(accuracy)
-
-a = knn("./naivebayes/txtfile/car_prepro.txt",0.5,3)
-b = knn("./naivebayes/txtfile/car_prepro.txt",0.5,3)
