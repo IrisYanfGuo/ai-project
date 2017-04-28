@@ -1,8 +1,7 @@
-from readData import readData
-
 import math
 import operator
 from random import random
+import toolkit as tk
 
 
 # iris, continuous variables
@@ -23,8 +22,8 @@ class Naive_bayes(object):
 
 
         self.__filename = filename
-        f = readData(self.__filename)
-        self.__attributes, self.__instances = f.readDataSet()
+
+        self.__attributes, self.__instances = tk.readDataSet(self.__filename)
         self.__trainSet, self.__testSet = self.splitDataSet(split)
         self.train()
         self.getPrediction()
@@ -133,7 +132,7 @@ class Naive_bayes(object):
         print(accuracy)
 
 
-car_naive = Naive_bayes("./txtfile/car_prepro.txt", 0.5)
+car_naive = Naive_bayes("../dataset/car.txt", 0.5)
 
-car_naive2 = Naive_bayes("./txtfile/car_prepro.txt", 0.5)
+#car_naive2 = Naive_bayes("./txtfile/car_prepro.txt", 0.5)
 #car_naive2 = Naive_bayes("../car.txt", 0.5)
