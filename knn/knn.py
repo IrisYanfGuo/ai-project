@@ -3,10 +3,13 @@
 # Author: Jin LI
 # mail: jin.li@vub.ac.be; homtingli@gmail.com
 # Created Time: 2017-04-21 21:20:47
+
+
 import math
 from operator import itemgetter
 from random import random
 import toolkit as tk
+
 
 
 class Knn():
@@ -45,7 +48,7 @@ class Knn():
 
     def getNormalization(self):
         if len(self.__norm) == 0:
-            self.__normalization()
+            self.__normalization1()
         return self.__norm
 
     def __normalization(self):
@@ -58,12 +61,34 @@ class Knn():
             # print(min_val)
 
             if min_val != max_val:
+
+                # 这个归一化很奇怪啊, 虽然我推了一下,感觉按尺度缩放没啥问题,但是如果数据量太大 由于sum()太大,会不会溢出??
+                # 问题先放着,多选几个数据集对比一下归一化和没有归一化的
+                # 多看几种归一化的方法
                 t = [float(i) / sum(temp[:l - 1]) for i in temp[:l - 1]]
                 t.append(temp[l])
                 res.append(t)
             else:
                 res.append(temp)
 
+        return res
+
+    def __normalization1(self):
+        res = []
+        for column in range(len(self.__instances)):
+            l = len(self.__attributes)
+            temp = self.__instances[column][:]
+
+            max_val, min_val = max(temp[:l - 1]), min(temp[:l - 1])
+            # print(min_val)
+
+            if min_val != max_val:
+
+                t = [i/max_val for i in temp[:l - 1]]
+                t.append(temp[l])
+                res.append(t)
+            else:
+                res.append(temp)
         return res
 
     # to calculate the Euclidean distance
@@ -139,3 +164,9 @@ class Knn():
         # print(result)
         return self.__getResult(self.__testSet, predictions)
 
+
+value = 0
+for i in range(1000):
+    value += Knn("../dataset/iris.txt").training()
+
+print(value/1000)
