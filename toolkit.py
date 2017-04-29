@@ -7,7 +7,7 @@ def readDataSet(filename):
     # open dataset file to read data set
     attributes =[]
     instances = []
-    print("start reading dataSet")
+    # print("start reading dataSet")
     try:
         f = open(filename)
         line = f.readline()
@@ -22,7 +22,7 @@ def readDataSet(filename):
 
     except Exception as e:
         print("open file error")
-    print("reading completed!")
+    # print("reading completed!")
 
     return attributes, instances
 
