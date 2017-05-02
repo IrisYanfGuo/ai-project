@@ -2,6 +2,7 @@ import time
 import matplotlib.pyplot as plt
 import math
 import numpy as np
+from io import BytesIO
 # toolkit for project including File I/O, graphs
 
 def readDataSet(filename):
@@ -48,6 +49,13 @@ def readCsv(filename):
     # print("reading completed!")
 
     return attributes, instances
+
+def np_read(filename,comment='#',delimit=','):
+    f= open(filename,'rb')
+    data = f.read()
+    return np.genfromtxt(BytesIO(data), delimiter=delimit, comments=comment)
+
+
 
 
 
@@ -96,8 +104,32 @@ def z_score(alist):
         alist[i] = (alist[i]-x_mean)/x_sigma
     return alist
 
+def normalize4mat(mat):
+    '''
+    normalize for 2-d matrix
+    :param mat: matrix
+    :return: normalised matrix
+    '''
 
+    for col in range(len(mat)):
+        t = []
+        for row in range(len(mat[0])):
+            t.append(mat[row][col])
 
+        t = min_max(t)
+        for row in range(len(mat)):
+            mat[row][col] = t[row]
+    return mat
+
+# calculate the distance for 2 lists
+def dist4list(list1,list2):
+    if len(list1) != len(list2):
+        print("the lengths of the 2 lists are different!")
+    else:
+        dist = 0
+        for i in range(len(list1)):
+            dist += np.sqrt((list1[i]-list2[i])**2)
+        return dist
 
 
 
