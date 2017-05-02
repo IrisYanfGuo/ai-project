@@ -43,4 +43,25 @@ b.append(3)
 a.printA()
 ```
 
+#### May 2nd
+ ```python
+     def __normalization(self):
+        res = []
+        for column in range(len(self.__instances)):
+            l = len(self.__attributes)
+            temp = self.__instances[column][:]
 
+            max_val, min_val = max(temp[:l - 1]), min(temp[:l - 1])
+            # print(min_val)
+
+            if min_val != max_val:
+
+                t = [float(i) / sum(temp[:l - 1]) for i in temp[:l - 1]]
+                t.append(temp[l])
+                res.append(t)
+            else:
+                res.append(temp)
+
+        return res
+```
+以上这段normalization有问题
