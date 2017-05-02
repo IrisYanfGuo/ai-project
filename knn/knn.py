@@ -51,6 +51,9 @@ class Knn():
             self.__normalization1()
         return self.__norm
 
+    # guo may.2 : 这个nornalization 有问题, 归一化应该是对每一列归一化,而不是对每一行
+    # 关于归一化的方法,我看了两种 min_max 和 z_score, 我卸载toolkit 了
+    # 我尝试着改了一下你的代码,报了奇怪的错
     def __normalization(self):
         res = []
         for column in range(len(self.__instances)):
@@ -62,6 +65,7 @@ class Knn():
 
             if min_val != max_val:
 
+                # april.28 guo
                 # 这个归一化很奇怪啊, 虽然我推了一下,感觉按尺度缩放没啥问题,但是如果数据量太大 由于sum()太大,会不会溢出??
                 # 问题先放着,多选几个数据集对比一下归一化和没有归一化的
                 # 多看几种归一化的方法
@@ -73,23 +77,6 @@ class Knn():
 
         return res
 
-    def __normalization1(self):
-        res = []
-        for column in range(len(self.__instances)):
-            l = len(self.__attributes)
-            temp = self.__instances[column][:]
-
-            max_val, min_val = max(temp[:l - 1]), min(temp[:l - 1])
-            # print(min_val)
-
-            if min_val != max_val:
-
-                t = [i/max_val for i in temp[:l - 1]]
-                t.append(temp[l])
-                res.append(t)
-            else:
-                res.append(temp)
-        return res
 
     # to calculate the Euclidean distance
     def __getEuclideanDistance(self, data1, data2):
