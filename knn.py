@@ -4,6 +4,7 @@
 # mail: jin.li@vub.ac.be; homtingli@gmail.com
 # Created Time: 2017-04-21 21:20:47
 import math
+import numpy as np
 from operator import itemgetter
 from random import random
 from readData import readData
@@ -52,10 +53,11 @@ class knn():
 
     def getNormalization(self):
         if len(self.__norm)==0:
-            self.__normalization()
+            #self.__normalization()
+            self.__zero_one_normalization()
         return self.__norm
 
-    def __normalization(self):
+    def __normalization(self):  #这个是错的
         res = []
         for column in range(len(self.__instances)):
             l = len(self.__attributes)
@@ -70,6 +72,69 @@ class knn():
                 res.append(t)
             else:
                 res.append(temp)
+
+        return res
+
+    # LaTex：{x}_{normalization}=\frac{x-Min}{Max-Min}   min~max 标准化
+    def zero_one_normalization(self):
+        res = self.__instances[:]
+
+        nrow = len(self.__instances)
+        ncol = len(self.__attributes) #下面计算就不要减一,
+
+        for i in range(ncol): #竖排
+            maxx = max(self.__instances[x][i] for x in range(nrow))  #每一竖排的最大值
+            minx = min(self.__instances[x][i] for x in range(nrow))
+
+            if maxx - minx != 1.0:
+                for j in range(nrow): #横排
+                    #print(maxx - minx)
+                    res[j][i] = (self.__instances[j][i] - minx)/(maxx - minx)
+
+
+        return res
+
+    # LaTex：{x}_{normalization}=\frac{x-\mu }{\sigma }    sigma 标注话
+    def Z_ScoreNormalization(self):
+        res = self.__instances[:]
+
+        nrow = len(self.__instances)
+        ncol = len(self.__attributes)
+
+        for i in range(ncol): #竖排
+            average = np.average([self.__instances[x][i] for x in range(nrow)])
+            sigma = np.std([self.__instances[x][i] for x in range(nrow)])
+            #print(average,sig)
+
+            if sigma != 0:
+                for j in range(nrow): #横排
+                    res[j][i] = (self.__instances[j][i] - average) / sigma
+
+        return res
+
+    def log_Normalization(self):
+        res = self.__instances[:]
+
+        nrow = len(self.__instances)
+        ncol = len(self.__attributes)
+
+        for i in range(ncol):
+            logg = max(self.__instances[x][i] for x in range(nrow))
+            if np.log10(logg) !=0:
+                for j in range(nrow): #横排
+                    res[j][i] = np.log10(self.__instances[j][i]) / np.log10(logg)
+
+        return res
+
+    def atan_Normalization(self):
+        res = self.__instances[:]
+
+        nrow = len(self.__instances)
+        ncol = len(self.__attributes)
+
+        for i in range(ncol):
+            for j in range(nrow): #横排
+                res[j][i] = math.atan(self.__instances[j][i])*2 / math.pi
 
         return res
 
@@ -141,7 +206,10 @@ class knn():
     def training(self):
         predictions = []
         #self.__trainSet,self.__testSet = self.__splitDataSet(self.__instances,self.__split)
-        self.__trainSet,self.__testSet = self.__splitDataSet(self.__normalization(),self.__split)
+        self.__trainSet,self.__testSet = self.__splitDataSet(self.zero_one_normalization(),self.__split)
+        #self.__trainSet,self.__testSet = self.__splitDataSet(self.Z_ScoreNormalization(),self.__split)
+        #self.__trainSet,self.__testSet = self.__splitDataSet(self.log_Normalization(),self.__split)
+        #self.__trainSet,self.__testSet = self.__splitDataSet(self.atan_Normalization(),self.__split)
 
         for i in range(len(self.__testSet)):
             neighbors = self.__getKNearNeighbors(self.__trainSet,self.__testSet[i],self.__k)
