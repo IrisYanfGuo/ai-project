@@ -53,7 +53,11 @@ def readCsv(filename):
 def np_read(filename,comment='#',delimit=','):
     f= open(filename,'rb')
     data = f.read()
-    return np.genfromtxt(BytesIO(data), delimiter=delimit, comments=comment)
+    array= np.genfromtxt(BytesIO(data), delimiter=delimit, comments=comment)
+
+    attribute = array[:,:-1]
+    target = array[:,-1]
+    return attribute,target
 
 
 
