@@ -101,38 +101,20 @@ class knn():
         return np.sqrt(d)
 
     # get K near neighborhoods
-    # 获取还没有问题了, 字典会导致数据缺失
+    # 获取没有问题了, 字典会导致数据缺失, list不会
     def __getKNearNeighbors(self, trainSet, testInstance, n=3):
         distances = []
         neighbors = []
         neighbors2 = []
-        #dis = {}
 
         for i in range(len(trainSet)):
             dist = self.__getEuclideanDistance(testInstance,trainSet[i])
             distances.append((trainSet[i],dist))
 
-            #xxx = trainSet[i][:];xxx.append(i)
-            #dis.setdefault(tuple(xxx),dist)
-
         distances.sort(key=itemgetter(1))
-
-        #dis = sorted(dis.items(),key=itemgetter(1))
-
         for i in range(n):
             neighbors.append(distances[i][0])
-            #ttt = list(dis[i][0])
-            #neighbors2.append(ttt[:len(ttt)-1])
-
-            #if (neighbors!=neighbors2):
-                #print(neighbors,end=",")
-                #print(distances[i][1])
-                #print(len(distances))
-                #print(neighbors2,end=",")
-                #print(dis[i][1])
-                #print(len(dis))
-                #print()
-        #return n2  #使用 neighbors最好
+        
         return neighbors
 
 
