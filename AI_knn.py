@@ -147,6 +147,9 @@ class knn():
         return self.__predictions
 
     def getAccuracy(self):
+        if (len(self.__testSet[0])<=len(self.__attributes)):
+            return ("getAccuracy() ERROR, len(testSet) < len(trainSet)")
+
         correct = 0
         for i in range(len(self.__testSet)):
             if self.__testSet[i][-1] == self.__predictions[i]:
