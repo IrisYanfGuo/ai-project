@@ -5,6 +5,7 @@
 # Created Time: 2017-04-21 21:20:47
 import numpy as np
 from operator import itemgetter
+import toolkit as tk 
 
 # no np.mat in this program
 
@@ -31,68 +32,6 @@ class knn():
             for j in range(len(self.__attributes)):
                 self.__testSet[i][j] = float(self.__testSet[i][j])
 
-
-    # LaTex：{x}_{normalization}=\frac{x-Min}{Max-Min}   min~max Normalization
-    def zero_one_normalization(self,data):
-        res = data[:]
-
-        nrow = len(data)
-        ncol = len(self.__attributes) #to get the columns,
-
-        for i in range(ncol): #each columns
-            maxx = max(data[x][i] for x in range(nrow))  #max in each columns
-            minx = min(data[x][i] for x in range(nrow))
-
-            if maxx - minx != 1.0:
-                for j in range(nrow): #row
-                    res[j][i] = (data[j][i] - minx)/(maxx - minx)
-
-        return res
-
-    # LaTex：{x}_{normalization}=\frac{x-\mu }{\sigma }    sigma 标注话
-    def Z_ScoreNormalization(self,data):
-        res = data[:]
-
-        nrow = len(data)
-        ncol = len(self.__attributes)
-
-        for i in range(ncol): #竖排
-            average = np.average([data[x][i] for x in range(nrow)])
-            sigma = np.std([data[x][i] for x in range(nrow)])
-            #print(average,sig)
-
-            if sigma != 0:
-                for j in range(nrow): #横排
-                    res[j][i] = (data[j][i] - average) / sigma
-
-        return res
-
-    def log_Normalization(self,data):
-        res = data[:]
-
-        nrow = len(data)
-        ncol = len(self.__attributes)
-
-        for i in range(ncol):
-            logg = max(data[x][i] for x in range(nrow))
-            if np.log10(logg) !=0:
-                for j in range(nrow): #横排
-                    res[j][i] = np.log10(data[j][i]) / np.log10(logg)
-
-        return res
-
-    def atan_Normalization(self,data):
-        res = data[:]
-
-        nrow = len(data)
-        ncol = len(self.__attributes)
-
-        for i in range(ncol):
-            for j in range(nrow): #横排
-                res[j][i] = np.arctan(data[j][i])*2 / np.pi
-
-        return res
-
     # to calculate the Euclidean distance
     def __getEuclideanDistance(self, data1, data2):
         d = 0.0
@@ -101,20 +40,21 @@ class knn():
         return np.sqrt(d)
 
     # get K near neighborhoods
-    # 获取没有问题了, 字典会导致数据缺失, list不会
+    # 获取还没有问题了, 字典会导致数据缺失
     def __getKNearNeighbors(self, trainSet, testInstance, n=3):
         distances = []
         neighbors = []
-        neighbors2 = []
+        #neighbors2 = []
+        #dis = {}
 
         for i in range(len(trainSet)):
             dist = self.__getEuclideanDistance(testInstance,trainSet[i])
             distances.append((trainSet[i],dist))
 
         distances.sort(key=itemgetter(1))
+
         for i in range(n):
             neighbors.append(distances[i][0])
-        
         return neighbors
 
 
@@ -131,11 +71,11 @@ class knn():
 
     def training(self):
         predictions = []
-        self.__trainSet = self.zero_one_normalization(self.__trainSet)
-        self.__testSet = self.zero_one_normalization(self.__testSet)
+        self.__trainSet = tk.zero_one_normalization(self.__trainSet,len(self.__attributes))
+        self.__testSet = tk.zero_one_normalization(self.__testSet,len(self.__attributes))
 
-        self.__trainSet = self.atan_Normalization(self.__trainSet)
-        self.__testSet = self.atan_Normalization(self.__testSet)
+        self.__trainSet = tk.atan_Normalization(self.__trainSet,len(self.__attributes))
+        self.__testSet = tk.atan_Normalization(self.__testSet,len(self.__attributes))
 
         for i in range(len(self.__testSet)):
             neighbors = self.__getKNearNeighbors(self.__trainSet,self.__testSet[i],self.__k)
@@ -156,6 +96,4 @@ class knn():
                 correct += 1
         #print(correct)
         return (correct/float(len(self.__testSet))) *100.0
-
-
 
