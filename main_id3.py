@@ -8,15 +8,16 @@ from AI_id3 import id3
 import numpy as np
 
 attributes,instances = tk.readDataSet("dataset/car.txt")
-att,test = tk.readDataSet("dataset/car.txt")
+#att,test = tk.readDataSet("dataset/car.txt")
 #print(attributes)
-myid3 = id3(attributes,instances)
-t = myid3.training()
-#tk.createPlot(t)
-#print(list(t.keys()))
-#print(test)
-print(myid3.getResult(test))
+lst = []
+for i in range(500):
+	trainSet,testSet = tk.splitDataSet(instances,0.66)
+	myid3 = id3(attributes,trainSet)
+	t = myid3.training()
+	myid3.getResult(testSet)
+	lst.append(myid3.getAccuracy())
 
-
+print("mean: ",np.mean(lst),"std: ",np.std(lst))
 
 #tk.createPlot(t)
