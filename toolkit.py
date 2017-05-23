@@ -61,11 +61,6 @@ def np_read(filename,comment='#',delimit=','):
 
 
 
-
-
-
-
-
 def draw_bar(accuracy_list,save = False):
 
     d= accuracy_list

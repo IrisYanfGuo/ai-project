@@ -16,8 +16,10 @@ c = np.linspace(0,1,10)
 f = open("./dataset/iris.txt",'rb')
 data= f.read()
 c = np.genfromtxt(BytesIO(data),delimiter=',',comments='@')
-print(c[:,:-1])
-print(c[:,-1])
+#print(c[:,:-1])
+#print(c[:,-1])
 
+v = [1,2,3,4]
+print(np.linalg.norm(v))
 
 
