@@ -1,4 +1,4 @@
-@data play tennis
+@data set
 
 @attr Outlook
 @attr Temperature

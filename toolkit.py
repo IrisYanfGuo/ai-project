@@ -1,12 +1,11 @@
 import time
 import matplotlib.pyplot as plt
-import math
 import numpy as np
 from io import BytesIO
 # toolkit for project including File I/O, graphs
 
 def readDataSet(filename):
-    # open dataset file to read data set
+    # open dataSet file to read data set
     attributes =[]
     instances = []
     # print("start reading dataSet")
@@ -25,11 +24,22 @@ def readDataSet(filename):
     except Exception as e:
         print("open file error")
     # print("reading completed!")
-
     return attributes, instances
 
+#divide dataset into training and testing dataset
+def splitDataSet(dataSet,split=0.66):
+    trainSet = []
+    testSet = []
+
+    for i in range(len(dataSet)):
+        if np.random.rand() <= split:
+            trainSet.append(dataSet[i])
+        else:
+            testSet.append(dataSet[i])
+    return trainSet,testSet
+
 def readCsv(filename):
-    # open dataset file to read data set
+    # open dataSet file to read data set
     attributes =[]
     instances = []
     # print("start reading dataSet")
@@ -58,7 +68,6 @@ def np_read(filename,comment='#',delimit=','):
     attribute = array[:,:-1]
     target = array[:,-1]
     return attribute,target
-
 
 
 def draw_bar(accuracy_list,save = False):
@@ -130,7 +139,152 @@ def dist4list(list1,list2):
             dist += np.sqrt((list1[i]-list2[i])**2)
         return dist
 
+###########################################################
+#
+#  start normalization for nested list
+# Author: find the code online, 
+# thanks her/his very much
+#
+###########################################################        
+# LaTex：{x}_{normalization}=\frac{x-Min}{Max-Min}   min~max Normalization
+def zero_one_normalization(data,ncol):
+    res = data[:]
+    nrow = len(data)
 
+    for i in range(ncol): #each columns
+        maxx = max(data[x][i] for x in range(nrow))  #max in each columns
+        minx = min(data[x][i] for x in range(nrow))
+
+        if maxx - minx != 1.0:
+            for j in range(nrow): #row
+                res[j][i] = (data[j][i] - minx)/(maxx - minx)
+
+    return res
+
+# LaTex：{x}_{normalization}=\frac{x-\mu }{\sigma }    sigma 标注话
+def Z_ScoreNormalization(data,ncol):
+    res = data[:]
+    nrow = len(data)
+
+    for i in range(ncol): #竖排
+        average = np.average([data[x][i] for x in range(nrow)])
+        sigma = np.std([data[x][i] for x in range(nrow)])
+        #print(average,sig)
+
+        if sigma != 0:
+            for j in range(nrow): #横排
+                res[j][i] = (data[j][i] - average) / sigma
+
+    return res
+
+def log_Normalization(data,ncol):
+    res = data[:]
+    nrow = len(data)
+
+    for i in range(ncol):
+        logg = max(data[x][i] for x in range(nrow))
+        if np.log10(logg) !=0:
+            for j in range(nrow): #横排
+                res[j][i] = np.log10(data[j][i]) / np.log10(logg)
+
+    return res
+
+def atan_Normalization(data,ncol):
+    res = data[:]
+    nrow = len(data)
+
+    for i in range(ncol):
+        for j in range(nrow): #横排
+            res[j][i] = np.arctan(data[j][i])*2 / np.pi
+
+    return res
+
+###########################################################
+#
+#     start plot id3 
+# Author: find the code online, 
+# thanks her/him very much
+#
+###########################################################
+#定义文本框和箭头格式
+__decisionNode = dict(boxstyle="round4", fc="0.6") #定义判断节点形态
+__leafNode = dict(boxstyle="square", fc="0.8") #定义叶节点形态
+__arrow_args = dict(arrowstyle="<-") #定义箭头
+
+#绘制带箭头的注解
+#nodeTxt：节点的文字标注, centerPt：节点中心位置,
+#parentPt：箭头起点位置（上一节点位置）, nodeType：节点属性
+def __plotNode(nodeTxt, centerPt, parentPt, nodeType):
+    createPlot.ax1.annotate(nodeTxt, xy=parentPt,  xycoords='axes fraction',
+                            xytext=centerPt, textcoords='axes fraction',
+                            va="center", ha="center", bbox=nodeType, arrowprops=__arrow_args )
+
+#计算叶节点数
+def __getNumLeafs(myTree):
+    numLeafs = 0
+    firstStr = list(myTree.keys())[0]
+    secondDict = myTree[firstStr]
+    for key in secondDict.keys():
+        if type(secondDict[key]).__name__=='dict':#是否是字典
+            numLeafs += __getNumLeafs(secondDict[key]) #递归调用getNumLeafs
+        else:   numLeafs +=1 #如果是叶节点，则叶节点+1
+    return numLeafs
+
+#计算数的层数
+def __getTreeDepth(myTree):
+    maxDepth = 0
+    firstStr = list(myTree.keys())[0]
+    secondDict = myTree[firstStr]
+    for key in secondDict.keys():
+        if type(secondDict[key]).__name__=='dict':#是否是字典
+            thisDepth = 1 + __getTreeDepth(secondDict[key]) #如果是字典，则层数加1，再递归调用getTreeDepth
+        else:   thisDepth = 1
+        #得到最大层数
+        if thisDepth > maxDepth:
+            maxDepth = thisDepth
+    return maxDepth
+
+
+
+#在父子节点间填充文本信息
+#cntrPt:子节点位置, parentPt：父节点位置, txtString：标注内容
+def __plotMidText(cntrPt, parentPt, txtString):
+    xMid = (parentPt[0]-cntrPt[0])/2.0 + cntrPt[0]
+    yMid = (parentPt[1]-cntrPt[1])/2.0 + cntrPt[1]
+    createPlot.ax1.text(xMid, yMid, txtString, va="center", ha="center", rotation=30)
+
+#绘制树形图
+#myTree：树的字典, parentPt:父节点, nodeTxt：节点的文字标注
+def __plotTree(myTree, parentPt, nodeTxt):
+    numLeafs = __getNumLeafs(myTree)  #树叶节点数
+    depth = __getTreeDepth(myTree)    #树的层数
+    firstStr = list(myTree.keys())[0]     #节点标签
+    #计算当前节点的位置
+    cntrPt = (__plotTree.xOff + (1.0 + float(numLeafs))/2.0/__plotTree.totalW, __plotTree.yOff)
+    __plotMidText(cntrPt, parentPt, nodeTxt) #在父子节点间填充文本信息
+    __plotNode(firstStr, cntrPt, parentPt, __decisionNode) #绘制带箭头的注解
+    secondDict = myTree[firstStr]
+    __plotTree.yOff = __plotTree.yOff - 1.0/__plotTree.totalD
+    for key in secondDict.keys():
+        if type(secondDict[key]).__name__=='dict':#判断是不是字典，
+            __plotTree(secondDict[key],cntrPt,str(key))        #递归绘制树形图
+        else:   #如果是叶节点
+            __plotTree.xOff = __plotTree.xOff + 1.0/__plotTree.totalW
+            __plotNode(secondDict[key], (__plotTree.xOff, __plotTree.yOff), cntrPt, __leafNode)
+            __plotMidText((__plotTree.xOff, __plotTree.yOff), cntrPt, str(key))
+    __plotTree.yOff = __plotTree.yOff + 1.0/__plotTree.totalD
+
+#创建绘图区
+def createPlot(inTree):
+    fig = plt.figure(1, facecolor='white')
+    fig.clf()
+    axprops = dict(xticks=[], yticks=[])
+    createPlot.ax1 = plt.subplot(111, frameon=False, **axprops)
+    __plotTree.totalW = float(__getNumLeafs(inTree)) #树的宽度
+    __plotTree.totalD = float(__getTreeDepth(inTree)) #树的深度
+    __plotTree.xOff = -0.5/__plotTree.totalW; __plotTree.yOff = 1.0;
+    __plotTree(inTree, (0.5,1.0), '')
+    plt.show()
 
 
 

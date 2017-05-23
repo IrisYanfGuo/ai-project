@@ -62,6 +62,29 @@ class MDS(object):
                     bmat.append(t)
         return bmat
 
+    def eigen_decomposition(self,bmat,n):
+        # n 是希望能减少的特征的值
+        # 特征值分解
+        w,v = np.linalg.eig(bmat)
+
+        # 找出最大的n个值的下标
+        sort_index = np.argsort(w)
+
+        w_new = []
+        v_new = []
+        for i in sort_index:
+            w_new.append(w[i])
+            v_new.append(v[i])
+
+
+
+
+
+
+
+
+
+
 
 
 
