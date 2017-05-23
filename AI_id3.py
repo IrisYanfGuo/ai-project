@@ -15,6 +15,7 @@ class id3(object):
     def __init__(self,attributes,trainSet):
         self.__attributes = attributes
         self.__trainSet = trainSet
+        self.__testSet = []
         self.__predictions = []
         self.__tree = {}
 
@@ -86,24 +87,30 @@ class id3(object):
     # input test Data set and get corresponding results
     def getResult(self, testSet):
         self.__predictions = []
+        self.__testSet = testSet
         for i in range(len(testSet)):
             res = self.__getResult(self.__tree.copy(),testSet[i][:])
             self.__predictions.append(res)
 
-        # print accuracy
-        if (len(testSet[0])==len(self.__trainSet[0])):
-            count = 0
-            for i in range(len(testSet)):
-                if testSet[i][-1] == self.__predictions[i]:
-                    count = count + 1
-            print("Accuracy is: ",float(count)/len(testSet)*100,"%")
         return self.__predictions
+
+    def getAccuracy(self):
+        # print accuracy
+        if (len(self.__testSet)==0 or len(self.__predictions)==0):
+            return None
+        if (len(self.__testSet[0])==len(self.__trainSet[0])):
+            count = 0
+            for i in range(len(self.__testSet)):
+                if self.__testSet[i][-1] == self.__predictions[i]:
+                    count = count + 1
+        return float(count)/len(self.__testSet)*100
 
     # use iteration
     def __getResult(self,tree,data):
         firstLabel = list(tree.keys())[0] # the name of first label
         secondDict = tree[firstLabel]   # the corresponding value
         attrIndex = self.__attributes.index(firstLabel) # attr 's index
+        classLabel = None
         for key in secondDict.keys():
             if data[attrIndex]==key:
                 if type(secondDict[key]).__name__=="dict":
@@ -121,7 +128,7 @@ class id3(object):
             return classList[0]
         
         ########
-        print(len(datas[0]))
+        #print(len(datas[0]))
         if len(datas[0])==1: #The attribute is completely exhausted
             return self.__count_most_data(datas)
         ########
@@ -143,9 +150,3 @@ class id3(object):
             myTree[treeLabel][temp] = self.__training(
                 self.__selectDataSet(datas,bestAttrPosition,temp),subTreeLabel)
         return myTree
-
-
-
-
-
-
