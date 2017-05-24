@@ -1,5 +1,5 @@
-from readData import readData
 
+from toolkit import readDataSet
 import math
 import operator
 from random import random
@@ -27,8 +27,7 @@ class Naive_bayes_conti(object):
 
 
         self.__filename = filename
-        f = readData(self.__filename)
-        self.__attributes, self.__instances = f.readDataSet()
+        self.__attributes, self.__instances = readDataSet(filename)
         self.__trainSet, self.__testSet = self.splitDataSet(split)
         self.train()
         self.getPrediction()
@@ -162,4 +161,4 @@ class Naive_bayes_conti(object):
 
 
 for i in range(100):
-    iris = Naive_bayes_conti("../iris.txt",0.92)
+    iris = Naive_bayes_conti("../dataset/iris.txt",0.92)
