@@ -10,11 +10,6 @@ import toolkit as tk
 # no np.mat in this program
 
 class knn():
-    __attributes = []
-    __trainSet = []
-    __testSet = []
-    __predictions = []
-    __k = 3
 
     # read trainSet, testSet and "attributes" 
     def __init__(self,attributes,trainSet,testSet,k=3):
