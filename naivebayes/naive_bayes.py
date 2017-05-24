@@ -1,5 +1,6 @@
 import math
 import operator
+import pandas as pd
 from random import random
 import toolkit as tk
 
@@ -9,11 +10,9 @@ import toolkit as tk
 class Naive_bayes(object):
 
 
-    def __init__(self, filename, split):
+    def __init__(self, trainSet):
 
-        self.__attributes = []
-        self.__instances = []
-        self.__trainSet = []
+        self.__trainSet = trainSet
         self.__testSet = []
 
         self.__pc = {}
@@ -21,12 +20,8 @@ class Naive_bayes(object):
         self.__pxc = {}
 
 
-        self.__filename = filename
-
-        self.__attributes, self.__instances = tk.readDataSet(self.__filename)
-        self.__trainSet, self.__testSet = self.splitDataSet(split)
         self.train()
-        self.getPrediction()
+        #self.getPrediction()
 
     # divide dataset into training and testing dataset
     def splitDataSet(self, split):
@@ -132,7 +127,11 @@ class Naive_bayes(object):
         print(accuracy)
 
 
-car_naive = Naive_bayes("../dataset/car.txt", 0.5)
 
 #car_naive2 = Naive_bayes("./txtfile/car_prepro.txt", 0.5)
 #car_naive2 = Naive_bayes("../car.txt", 0.5)
+
+car = pd.read_csv("../dataset/car.csv")
+print(car.head())
+print(car.dtypes)
+
