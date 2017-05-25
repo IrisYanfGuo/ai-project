@@ -132,6 +132,16 @@ class Naive_bayes(object):
 #car_naive2 = Naive_bayes("../car.txt", 0.5)
 
 car = pd.read_csv("../dataset/car.csv")
-print(car.head())
-print(car.dtypes)
+#print(car.head())
+#print(car.dtypes)
 
+c = car.get_values()
+d=car['rating']
+print(type(d))
+d = d.astype("category")
+e = d.cat.rename_categories([1,2,3])
+print(e)
+
+# 获取attribute 的名字
+
+print(car.columns[0])

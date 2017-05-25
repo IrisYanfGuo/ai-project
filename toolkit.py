@@ -2,6 +2,7 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 from io import BytesIO
+import pandas as pd
 # toolkit for project including File I/O, graphs
 
 def readDataSet(filename):
@@ -25,6 +26,29 @@ def readDataSet(filename):
         print("open file error")
     # print("reading completed!")
     return attributes, instances
+
+def readCsv(filename):
+    attritutes = []
+    instances = []
+
+    # the attritutes include the name of the last column in the csv file
+    csv = pd.read_csv(filename)
+
+    attritutes = csv.columns
+    for i in attritutes:
+        if(csv[i].dtype=='object'):
+            csv[i] = csv[i].astype("category")
+    instances = csv
+    return attritutes, instances
+#b['variety'] = b['variety'].astype('category')
+#print(b.dtypes)
+#print(b[b['variety']=='Setosa'])
+
+
+
+
+
+
 
 #divide dataset into training and testing dataset
 def splitDataSet(dataSet,split=0.66):
