@@ -5,6 +5,7 @@ from io import BytesIO
 import pandas as pd
 # toolkit for project including File I/O, graphs
 
+# 返回的instance 为matrix
 def readDataSet(filename):
     # open dataSet file to read data set
     attributes =[]
@@ -20,6 +21,7 @@ def readDataSet(filename):
     # print("reading completed!")
     return attributes, instances
 
+# 返回的instances 为data.frame
 def readCsv(filename):
     attritutes = []
     instances = []
@@ -33,13 +35,6 @@ def readCsv(filename):
             csv[i] = csv[i].astype("category")
     instances = csv
     return attritutes, instances
-
-#a,b = readCsv("./dataset/iris.csv")
-#print(b)
-
-
-
-
 
 
 
@@ -55,29 +50,7 @@ def splitDataSet(dataSet,split=0.66):
             testSet.append(dataSet[i])
     return trainSet,testSet
 
-'''
-def readCsv(filename):
-    # open dataSet file to read data set
-    attributes =[]
-    instances = []
-    # print("start reading dataSet")
-    try:
-        f = open(filename)
-        line = f.readline()
-        while line:
-            if line.startswith("@attr") or line.startswith("@ATTR"):
-                attributes.append(line.split()[1])
-            if not line.startswith("@") and len(line) > 2:
-                instances.append(line.strip().split(","))
-            line = f.readline()
-        f.close()
 
-    except Exception as e:
-        print("open file error")
-    # print("reading completed!")
-
-    return attributes, instances
-'''
 def np_read(filename,comment='#',delimit=','):
     f= open(filename,'rb')
     data = f.read()
@@ -86,8 +59,6 @@ def np_read(filename,comment='#',delimit=','):
     attribute = array[:,:-1]
     target = array[:,-1]
     return attribute,target
-
-
 
 
 def draw_bar(accuracy_list,save = False):
