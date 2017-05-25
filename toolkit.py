@@ -40,9 +40,9 @@ def readCsv(filename):
             csv[i] = csv[i].astype("category")
     instances = csv
     return attritutes, instances
-#b['variety'] = b['variety'].astype('category')
-#print(b.dtypes)
-#print(b[b['variety']=='Setosa'])
+
+#a,b = readCsv("./dataset/iris.csv")
+#print(b)
 
 
 
@@ -62,6 +62,7 @@ def splitDataSet(dataSet,split=0.66):
             testSet.append(dataSet[i])
     return trainSet,testSet
 
+'''
 def readCsv(filename):
     # open dataSet file to read data set
     attributes =[]
@@ -83,7 +84,7 @@ def readCsv(filename):
     # print("reading completed!")
 
     return attributes, instances
-
+'''
 def np_read(filename,comment='#',delimit=','):
     f= open(filename,'rb')
     data = f.read()
