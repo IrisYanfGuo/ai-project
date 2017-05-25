@@ -9,12 +9,12 @@ import time
 # iris, continuous variables
 # car, discrete variables
 class Naive_bayes(object):
-    def __init__(self, trainSet, attributes):
+    def __init__(self, trainSet, attributes,testSet):
 
         self.__trainSet = trainSet
         self.__attributes = attributes
 
-        self.__testSet = trainSet
+        self.__testSet = testSet
 
         self.__pc = {}
         self.__px = []
@@ -128,7 +128,7 @@ class Naive_bayes(object):
     def getAccuracy(self, testSet, predictions):
         correct = 0
         for i in range(len(testSet)):
-            if testSet.loc[i][-1] == predictions[i]:
+            if testSet.iloc[i][-1] == predictions[i]:
                 correct += 1
         # print(correct)
         return (correct / float(len(testSet))) * 100.0
@@ -136,7 +136,7 @@ class Naive_bayes(object):
     def getPrediction(self):
         predictions = []
         for i in range(len(self.__testSet)):
-            result = self.predict(self.__testSet.loc[i])
+            result = self.predict(self.__testSet.iloc[i])
             predictions.append(result)
 
         # print(result)
@@ -146,17 +146,12 @@ class Naive_bayes(object):
 
 attri, car = tk.readCsv("../dataset/car.csv")
 
-car = car[:-1]
+train = car[:1200]
+test = car[1201:-1]
+#print(car)
+#print(test)
 
-#print(car.groupby([attri[-1], attri[1]]).count())
-# iris_naive = Naive_bayes(car,attri)
+car_naive = Naive_bayes(train, attri,train)
 
-car_naive = Naive_bayes(car, attri)
 
-cat2 = car.groupby([attri[-1], attri[-3]]).count()
-colname = cat2.columns
-# print(cat2)
 #print(car.index)
-print(len(car))
-for j in range(len(car.loc[1])):
-    print(car.loc[1][j])
