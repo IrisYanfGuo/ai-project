@@ -4,10 +4,11 @@ import pandas as pd
 
 class LogisticRegression(object):
 
-    def __init__(self,attributes,trainSet):
+    def __init__(self,attributes,trainSet,testSet):
 
         self.__attributes = attributes
         self.__trainSet = trainSet
+        self.__testSet = testSet
         self.train(self.__trainSet,0,0)
 
     def sigmoid(self,x):
@@ -30,7 +31,7 @@ class LogisticRegression(object):
 
 
 
-iris_csv = pd.read_csv("../dataset/iris.csv")
-a=iris_csv.fillna(method="bfill")
+a = pd.read_csv("../dataset/transfusion.csv")
 
-print(a)
+b = a.as_matrix()
+print(b[0][1])
