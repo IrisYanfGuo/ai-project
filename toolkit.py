@@ -1,6 +1,7 @@
 import time
 import matplotlib.pyplot as plt
 import numpy as np
+import math
 from io import BytesIO
 import pandas as pd
 # toolkit for project including File I/O, graphs
@@ -279,5 +280,10 @@ def createPlot(inTree):
 
 
 
+b,a = readDataSet("./dataset/iris.csv")
+a = a[:,:-1]
 
+a = np.array([1,2,3,4,5,6,7,8,9])
+a = a.reshape((3,3))
+print(a)
 

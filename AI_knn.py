@@ -91,5 +91,3 @@ class knn():
                 correct += 1
         #print(correct)
         return (correct/float(len(self.__testSet))) *100.0
-
-a = knn()
