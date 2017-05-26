@@ -280,10 +280,6 @@ def createPlot(inTree):
 
 
 
-b,a = readDataSet("./dataset/iris.csv")
-a = a[:,:-1]
 
-a = np.array([1,2,3,4,5,6,7,8,9])
-a = a.reshape((3,3))
-print(a)
+
 

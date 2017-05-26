@@ -5,7 +5,7 @@ import toolkit as tk
 
 
 class LogisticRegression(object):
-    def __init__(self, attributes, trainSet, testSet, alpha=0.2, step=1000):
+    def __init__(self, attributes, trainSet, testSet, alpha=0.2, step=1):
 
         self.__attributes = attributes
         self.__trainSet = trainSet
@@ -18,7 +18,7 @@ class LogisticRegression(object):
 
     def train(self, trainSet, alpha, step):
         # random assign values to weights
-        self.__weight = np.random.rand(len(self.__attributes), 1)
+        self.__weight = np.random.rand(len(self.__attributes), 3)
 
         target = np.array([trainSet[i][-1] for i in range(len(trainSet))])
         X = np.array([trainSet[i][:-1] for i in range(len(trainSet))])
@@ -30,12 +30,11 @@ class LogisticRegression(object):
             error = target - f_out
             # bug
             self.__weight = self.__weight + alpha * np.transpose(X).dot(np.transpose(error))
-        print(error)
-        print(f_out)
+        print(self.__weight)
 
     def predict(self, array):
         out = self.sigmoid(array.dot(self.__weight))
-        if (out > 0.5):
+        if (out > 0.9):
             return 1
         else:
             return 0
@@ -43,7 +42,7 @@ class LogisticRegression(object):
     def getAccuracy(self, testSet, predictions):
         correct = 0
         for i in range(len(testSet)):
-            if testSet[i][-1] == predictions[i]:
+            if testSet[i,-1] == predictions[i]:
                 correct += 1
         # print(correct)
         return (correct / float(len(testSet))) * 100.0
@@ -60,9 +59,12 @@ class LogisticRegression(object):
 
 
 attri, trainset = tk.readDataSet("../dataset/transfusion.csv")
-print(attri)
-print([trainset[i][-1] for i in range(len(trainset))])
 
-a = trainset[:500]
-b = trainset[:]
-logi_test = LogisticRegression(attri, a, b)
+
+trainset = tk.atan_Normalization(trainset,len(trainset[0,:]))
+
+
+a = trainset[:500,:]
+b = trainset[501:-1,:]
+print(a)
+#logi_test = LogisticRegression(attri, a, b)

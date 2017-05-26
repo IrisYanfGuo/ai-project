@@ -133,8 +133,9 @@ class Naive_bayes_conti(object):
         print(accuracy)
 
 
-attri, iris = tk.readCsv("../dataset/iris.csv")
+attri, iris = tk.readCsv("../dataset/transfusion.csv")
 iris = iris.fillna(method='pad')
+print(iris)
 iris_naive = Naive_bayes_conti(iris, attri, iris)
 c = iris.groupby([attri[-1]]).var()
 

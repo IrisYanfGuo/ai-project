@@ -153,5 +153,4 @@ test = car[1201:-1]
 
 car_naive = Naive_bayes(train, attri,train)
 
-
 #print(car.index)
