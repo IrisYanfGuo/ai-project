@@ -11,15 +11,10 @@ import numpy as np
 class kmeans(object):
     """docstring for kmeans"""
     # read trainSet, "attributes", and the number of cluster
-    def __init__(self, attributes,trainSet,k=2):
-        self.__attributes = attributes
-        self.__k = k
+    def __init__(self):
         self.__predictions = []
-        self.__trainSet = trainSet
-
-        for i in range(len(trainSet)):
-            for j in range(len(attributes)):
-                self.__trainSet[i][j] = float(self.__trainSet[i][j])
+        self.__k = 2
+        pass
 
 
     def __getEuclideanDistance(self,data1,data2):
@@ -39,26 +34,33 @@ class kmeans(object):
 
 
     #print(np.random.rank(k))
-    def training(self):
-        row,col = len(self.__trainSet)-1,len(self.__attributes)
+    def training(self,attributes,trainSet,k=2):
+        self.__k = k
+        self.__attributes = attributes
+
+        for i in range(len(trainSet)):
+            for j in range(len(attributes)):
+                trainSet[i][j] = float(trainSet[i][j])
+
+        self.__trainSet = trainSet
+        row,col = len(trainSet)-1,len(attributes)
         cluster_lst = self.__randomCentral()
 
         for i in range(row):
             minDist = np.inf
             minIndex = 0
 
-            for j in range(self.__k):
-                distance = self.__getEuclideanDistance(cluster_lst[j][0],self.__trainSet[i])
+            for j in range(k):
+                distance = self.__getEuclideanDistance(cluster_lst[j][0],trainSet[i])
                 if distance < minDist:
                     minDist = distance
                     minIndex = j
 
-            cluster_lst[minIndex].append(self.__trainSet[i])
+            cluster_lst[minIndex].append(trainSet[i])
 
         self.__predictions = cluster_lst
-        return cluster_lst
 
-    def getResult(self):
+    def getPrediction(self):
         for i in range(self.__k):
             print("cluster "+str(i)+": ")
             for j in range(len(self.__predictions[i])):
