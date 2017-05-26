@@ -7,26 +7,19 @@ import toolkit as tk
 from AI_id3 import id3
 import numpy as np
 
-attributes,instances = tk.readDataSet("dataset/sunburnt.csv")
-attributes,test = tk.readDataSet("dataset/sunburnt.csv")
+attributes,instances = tk.readDataSet("sunburnt.csv")
+attributes,test = tk.readDataSet("sunburnt.csv")
 
 attributes = (list(attributes))
+#print(attributes)
 
 instances = instances.tolist()
 test = test.tolist()
 
 
-myid3 = id3()
-myid3.training(attributes,instances)
+myid3 = id3(attributes,instances)
 acc,pre = myid3.getPrediction(test)
 print(acc,pre)
 
-#t = myid3.training()
-#tk.createPlot(t)
-#print(list(t.keys()))
-#print(test)
-#print(myid3.getResult(test))
 
-
-
-#tk.createPlot(t)
+#tk.createPlot(myid3.getTree())

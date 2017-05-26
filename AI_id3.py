@@ -12,9 +12,11 @@ import toolkit as tk
 
 class id3(object):
     """docstring for id3"""
-    def __init__(self):
-        self.__attributes = []
+    def __init__(self,attributes,trainSet):
+        self.__attributes = attributes
+        self.__trainSet = trainSet
         self.__tree = {}
+        self.__training()
 
     #calculate entropy
     def __Entropy(self,datas):
@@ -66,7 +68,7 @@ class id3(object):
     ####
     # Few obey the majority
     def __count_most_data(self,classList):
-        classCount={}#每种类别包含的个数
+        classCount={}#the number of each class
         for i in classList:
             classCount[i[0]] = 1 + classCount.get(i[0],0)
 
@@ -76,9 +78,10 @@ class id3(object):
 
     # train Data Set,
     # return a dictionay 
-    def training(self,attributes,trainSet):
-        self.__attributes = attributes
-        self.__tree = self.__training(trainSet,attributes[:])
+    def __training(self):
+        self.__tree = self.__trainhelp(self.__trainSet[:],self.__attributes[:])
+        
+    def getTree(self):
         return self.__tree
 
     # input test Data set and get corresponding results
@@ -100,12 +103,9 @@ class id3(object):
 
         return Accuracy,predictions
 
-    def getAccuracy(self):                    
-        acc =  "Accuracy is: "+str(float(count)/len(self.__testSet)*100)+"%"
-        pass
-
     # use iteration
     def __getResult(self,tree,data):
+        #print(tree)
         firstLabel = list(tree.keys())[0] # the name of first label
         secondDict = tree[firstLabel]   # the corresponding value
         attrIndex = self.__attributes.index(firstLabel) # attr 's index
@@ -118,7 +118,7 @@ class id3(object):
         return classLabel
 
     # use iteration to train
-    def __training(self,datas,attrs):
+    def __trainhelp(self,datas,attrs):
         classList = []
         for data in datas:
             classList.append(data[-1])
@@ -146,7 +146,7 @@ class id3(object):
             subValues.add(temp[bestAttrPosition])
         for temp in subValues:
             subTreeLabel = attrs[:]
-            myTree[treeLabel][temp] = self.__training(
+            myTree[treeLabel][temp] = self.__trainhelp(
                 self.__selectDataSet(datas,bestAttrPosition,temp),subTreeLabel)
         return myTree
 
