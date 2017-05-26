@@ -8,26 +8,23 @@ import toolkit as tk
 from AI_knn import knn
 import numpy as np
 
-attributes, instences = tk.readDataSet("dataset/iris.txt")
+attributes, instences = tk.readDataSet("dataset/iris.csv")
+attributes = list(attributes)
 
-# trainSet,testSet = tk.splitDataSet(instences,0.8)
-# myknn = knn(attributes,trainSet,testSet,3)
-new_testSet = []
-for t in testSet:
-    new_testSet.append(t[:len(attributes)])
-print(new_testSet)
+instences = instences.tolist()
+
 
 lst = []
-for i in range(1):
+for i in range(5):
     trainSet, testSet = tk.splitDataSet(instences, 0.8)
-    myknn = knn(attributes, trainSet, testSet, 3)
-    myknn.training()
-    print(myknn.getResult())
-    print(myknn.getAccuracy())
+    myknn = knn()
+    myknn.training(attributes,trainSet)
+    acc,result = myknn.getPrediction(testSet,3)
+    lst.append(acc)
 
 
 
-# tk.draw_bar(lst)
+tk.draw_bar(lst)
 
 # print(lst)
 
