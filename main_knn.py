@@ -30,3 +30,5 @@ for i in range(5):
 print(lst)
 
 print("mean = ",np.mean(lst),";std = ", np.std(lst))
+
+

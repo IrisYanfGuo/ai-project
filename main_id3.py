@@ -22,4 +22,4 @@ acc,pre = myid3.getPrediction(test)
 print(acc,pre)
 
 
-#tk.createPlot(myid3.getTree())
+tk.createPlot(myid3.getTree())

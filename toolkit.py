@@ -144,81 +144,82 @@ def atan_Normalization(matrix,col_number):
 #
 ###########################################################
 #定义文本框和箭头格式
-__decisionNode = dict(boxstyle="round4", fc="0.6") #定义判断节点形态
-__leafNode = dict(boxstyle="square", fc="0.8") #定义叶节点形态
-__arrow_args = dict(arrowstyle="<-") #定义箭头
+__decisionNode = dict(boxstyle="round4", fc="0.6") #Define the shape of the node
+__leafNode = dict(boxstyle="square", fc="0.8") #Define the leaf node shape
+__arrow_args = dict(arrowstyle="<-") #define arrow
 
-#绘制带箭头的注解
-#nodeTxt：节点的文字标注, centerPt：节点中心位置,
-#parentPt：箭头起点位置（上一节点位置）, nodeType：节点属性
+#Draw annotations with arrows
+#nodeTxt：mark the text of the node, centerPt：the position of node center,
+#parentPt：Arrow start position, nodeType：node attribute
 def __plotNode(nodeTxt, centerPt, parentPt, nodeType):
     createPlot.ax1.annotate(nodeTxt, xy=parentPt,  xycoords='axes fraction',
                             xytext=centerPt, textcoords='axes fraction',
                             va="center", ha="center", bbox=nodeType, arrowprops=__arrow_args )
 
-#计算叶节点数
+#Calculate the number of leaf nodes
 def __getNumLeafs(myTree):
     numLeafs = 0
     firstStr = list(myTree.keys())[0]
     secondDict = myTree[firstStr]
     for key in secondDict.keys():
-        if type(secondDict[key]).__name__=='dict':#是否是字典
-            numLeafs += __getNumLeafs(secondDict[key]) #递归调用getNumLeafs
-        else:   numLeafs +=1 #如果是叶节点，则叶节点+1
+        if type(secondDict[key]).__name__=='dict':#is it a dictionary?
+            numLeafs += __getNumLeafs(secondDict[key]) #iteration
+        else:   numLeafs +=1 #If it is a leaf node, the leaf node is +1
     return numLeafs
 
-#计算数的层数
+#get the tree depth
 def __getTreeDepth(myTree):
     maxDepth = 0
     firstStr = list(myTree.keys())[0]
     secondDict = myTree[firstStr]
     for key in secondDict.keys():
-        if type(secondDict[key]).__name__=='dict':#是否是字典
-            thisDepth = 1 + __getTreeDepth(secondDict[key]) #如果是字典，则层数加1，再递归调用getTreeDepth
+        if type(secondDict[key]).__name__=='dict':#is it a dictionary?
+            thisDepth = 1 + __getTreeDepth(secondDict[key]) 
+            #if dictionary, the number of layers plus 1, and then call getTreeDepth()
         else:   thisDepth = 1
-        #得到最大层数
+        #max depth
         if thisDepth > maxDepth:
             maxDepth = thisDepth
     return maxDepth
 
 
 
-#在父子节点间填充文本信息
-#cntrPt:子节点位置, parentPt：父节点位置, txtString：标注内容
+#Fill text between parent and child nodes
+#cntrPt:position of child node, parentPt:position of father node, txtString: Label content
 def __plotMidText(cntrPt, parentPt, txtString):
     xMid = (parentPt[0]-cntrPt[0])/2.0 + cntrPt[0]
     yMid = (parentPt[1]-cntrPt[1])/2.0 + cntrPt[1]
     createPlot.ax1.text(xMid, yMid, txtString, va="center", ha="center", rotation=30)
 
-#绘制树形图
-#myTree：树的字典, parentPt:父节点, nodeTxt：节点的文字标注
+#start to draw
+#myTree:Tree dictionary, parentPt:, nodeTxt
 def __plotTree(myTree, parentPt, nodeTxt):
-    numLeafs = __getNumLeafs(myTree)  #树叶节点数
-    depth = __getTreeDepth(myTree)    #树的层数
-    firstStr = list(myTree.keys())[0]     #节点标签
-    #计算当前节点的位置
+    numLeafs = __getNumLeafs(myTree)  #Number of leaf nodes
+    depth = __getTreeDepth(myTree)    #depth of tree
+    firstStr = list(myTree.keys())[0]     #node label
+    #Calculate the location of the current node
     cntrPt = (__plotTree.xOff + (1.0 + float(numLeafs))/2.0/__plotTree.totalW, __plotTree.yOff)
-    __plotMidText(cntrPt, parentPt, nodeTxt) #在父子节点间填充文本信息
-    __plotNode(firstStr, cntrPt, parentPt, __decisionNode) #绘制带箭头的注解
+    __plotMidText(cntrPt, parentPt, nodeTxt) #Fill text between parent and child nodes
+    __plotNode(firstStr, cntrPt, parentPt, __decisionNode) #Draw annotations with arrows
     secondDict = myTree[firstStr]
     __plotTree.yOff = __plotTree.yOff - 1.0/__plotTree.totalD
     for key in secondDict.keys():
-        if type(secondDict[key]).__name__=='dict':#判断是不是字典，
-            __plotTree(secondDict[key],cntrPt,str(key))        #递归绘制树形图
-        else:   #如果是叶节点
+        if type(secondDict[key]).__name__=='dict':#dict ?，
+            __plotTree(secondDict[key],cntrPt,str(key))   #recursion
+        else:   #if it is leaf node
             __plotTree.xOff = __plotTree.xOff + 1.0/__plotTree.totalW
             __plotNode(secondDict[key], (__plotTree.xOff, __plotTree.yOff), cntrPt, __leafNode)
             __plotMidText((__plotTree.xOff, __plotTree.yOff), cntrPt, str(key))
     __plotTree.yOff = __plotTree.yOff + 1.0/__plotTree.totalD
 
-#创建绘图区
+#create plot
 def createPlot(inTree):
     fig = plt.figure(1, facecolor='white')
     fig.clf()
     axprops = dict(xticks=[], yticks=[])
     createPlot.ax1 = plt.subplot(111, frameon=False, **axprops)
-    __plotTree.totalW = float(__getNumLeafs(inTree)) #树的宽度
-    __plotTree.totalD = float(__getTreeDepth(inTree)) #树的深度
+    __plotTree.totalW = float(__getNumLeafs(inTree)) #The width of the tree
+    __plotTree.totalD = float(__getTreeDepth(inTree)) #the depth of the tree
     __plotTree.xOff = -0.5/__plotTree.totalW; __plotTree.yOff = 1.0;
     __plotTree(inTree, (0.5,1.0), '')
     plt.show()
