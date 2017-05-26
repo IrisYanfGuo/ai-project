@@ -12,25 +12,10 @@ import toolkit as tk
 class knn():
     __attributes = []
     __trainSet = []
-    __testSet = []
-    __predictions = []
-    __k = 3
 
     # read trainSet, testSet and "attributes" 
-    def __init__(self,attributes,trainSet,testSet,k=3):
-        self.__k = k
-        self.__attributes = attributes
-        self.__trainSet = trainSet
-        self.__testSet = testSet
-
-        # this is for double check, because we need numeric
-        for i in range(len(self.__trainSet)):
-            for j in range(len(self.__attributes)):
-                self.__trainSet[i][j] = float(self.__trainSet[i][j])
-
-        for i in range(len(self.__testSet)):
-            for j in range(len(self.__attributes)):
-                self.__testSet[i][j] = float(self.__testSet[i][j])
+    def __init__(self):
+        pass
 
     # to calculate the Euclidean distance
     def __getEuclideanDistance(self, data1, data2):
@@ -40,7 +25,7 @@ class knn():
         return np.sqrt(d)
 
     # get K near neighborhoods
-    # 获取还没有问题了, 字典会导致数据缺失
+    # 获取没有问题了, 字典会导致数据缺失
     def __getKNearNeighbors(self, trainSet, testInstance, n=3):
         distances = []
         neighbors = []
@@ -69,19 +54,39 @@ class knn():
         return temp[0][0]
 
 
-    def training(self):
+    def training(self,attributes,trainSet):
+        self.__attributes = attributes
+        self.__trainSet = trainSet
+
+        # this is for double check, because we need numeric
+        for i in range(len(self.__trainSet)):
+            for j in range(len(self.__attributes)):
+                self.__trainSet[i][j] = float(self.__trainSet[i][j])
+
+    def getPrediction(self,testSet,k=3):
+        for i in range(len(testSet)):
+            for j in range(len(self.__attributes)):
+                testSet[i][j] = float(testSet[i][j])
+
         predictions = []
-        self.__trainSet = tk.zero_one_normalization(self.__trainSet,len(self.__attributes))
-        self.__testSet = tk.zero_one_normalization(self.__testSet,len(self.__attributes))
-
-        self.__trainSet = tk.atan_Normalization(self.__trainSet,len(self.__attributes))
-        self.__testSet = tk.atan_Normalization(self.__testSet,len(self.__attributes))
-
-        for i in range(len(self.__testSet)):
-            neighbors = self.__getKNearNeighbors(self.__trainSet,self.__testSet[i],self.__k)
+        
+        for i in range(len(testSet)):
+            neighbors = self.__getKNearNeighbors(self.__trainSet,testSet[i],k)
             result = self.__getClassification(neighbors)
             predictions.append(result)
-        self.__predictions = predictions
+
+
+        if (len(testSet[0]) == len(self.__trainSet)):
+            Accuracy = np.nan
+        else:
+            correct = 0
+            for i in range(len(testSet)):
+                if testSet[i][-1] == predictions[i]:
+                    correct += 1
+            Accuracy = correct/float(len(testSet)) *100.0
+
+        return Accuracy,predictions
+##########################################################
 
     def getResult(self):
         return self.__predictions
