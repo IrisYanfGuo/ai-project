@@ -6,14 +6,18 @@
 
 import toolkit as tk 
 import numpy as np 
-from AI_kmeans import kmeans 
+from AI_kmeans import kmeans
+from AI_knn import knn
 
-attributes,instences = tk.readDataSet("dataset/iris.txt")
+attributes,instences = tk.readDataSet("dataset/iris.csv")
+attributes = list(attributes)
+
+instences =  instences.tolist()
 
 #for this one, instences = trainSet + testSet
 #trainSet,testSet = tk.splitDataSet(instences,0.8)
 
-mykmeans = kmeans(attributes,instences,3)
-mykmeans.training()
+mykmeans = kmeans()
+mykmeans.training(attributes,instences,3)
+mykmeans.getPrediction()
 
-mykmeans.getResult()
