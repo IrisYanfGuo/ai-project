@@ -2,29 +2,41 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 from io import BytesIO
+import pandas as pd
 # toolkit for project including File I/O, graphs
 
+# 返回的instance 为matrix
 def readDataSet(filename):
     # open dataSet file to read data set
     attributes =[]
     instances = []
     # print("start reading dataSet")
     try:
-        f = open(filename)
-        line = f.readline()
-        while line:
-            line = line.strip()
-            if line.startswith("@attr") or line.startswith("@ATTR"):
-                attributes.append(line.split()[1])
-            if not line.startswith("@") and len(line) > 2:
-                instances.append(line.strip().split(","))
-            line = f.readline()
-        f.close()
+        attributes,instances = readCsv(filename)
+        instances = instances.as_matrix()
+        attributes = attributes[:-1]
 
     except Exception as e:
         print("open file error")
     # print("reading completed!")
     return attributes, instances
+
+# 返回的instances 为data.frame
+def readCsv(filename):
+    attritutes = []
+    instances = []
+
+    # the attritutes include the name of the last column in the csv file
+    csv = pd.read_csv(filename)
+
+    attritutes = csv.columns
+    for i in attritutes:
+        if(csv[i].dtype=='object'):
+            csv[i] = csv[i].astype("category")
+    instances = csv
+    return attritutes, instances
+
+
 
 #divide dataset into training and testing dataset
 def splitDataSet(dataSet,split=0.66):
@@ -37,37 +49,6 @@ def splitDataSet(dataSet,split=0.66):
         else:
             testSet.append(dataSet[i])
     return trainSet,testSet
-
-def readCsv(filename):
-    # open dataSet file to read data set
-    attributes =[]
-    instances = []
-    # print("start reading dataSet")
-    try:
-        f = open(filename)
-        line = f.readline()
-        while line:
-            if line.startswith("@attr") or line.startswith("@ATTR"):
-                attributes.append(line.split()[1])
-            if not line.startswith("@") and len(line) > 2:
-                instances.append(line.strip().split(","))
-            line = f.readline()
-        f.close()
-
-    except Exception as e:
-        print("open file error")
-    # print("reading completed!")
-
-    return attributes, instances
-
-def np_read(filename,comment='#',delimit=','):
-    f= open(filename,'rb')
-    data = f.read()
-    array= np.genfromtxt(BytesIO(data), delimiter=delimit, comments=comment)
-
-    attribute = array[:,:-1]
-    target = array[:,-1]
-    return attribute,target
 
 
 def draw_bar(accuracy_list,save = False):
@@ -94,41 +75,6 @@ def save_img():
     plt.savefig(name)
 
 
-# add some method for normalisation  1. Min-max 2. z-score
-
-def min_max(alist,min1=0,max1=1):
-    min0 = min(alist)
-    max0 = max(alist)
-
-    for i in range(len(alist)):
-        alist[i] = min1+(alist[i]-min0)/(max0-min0)*(max1-min1)
-    return alist
-
-def z_score(alist):
-    x_mean= np.mean(alist)
-    x_sigma = np.square(np.var(alist))
-
-    for i in range(len(alist)):
-        alist[i] = (alist[i]-x_mean)/x_sigma
-    return alist
-
-def normalize4mat(mat):
-    '''
-    normalize for 2-d matrix
-    :param mat: matrix
-    :return: normalised matrix
-    '''
-
-    for col in range(len(mat)):
-        t = []
-        for row in range(len(mat[0])):
-            t.append(mat[row][col])
-
-        t = min_max(t)
-        for row in range(len(mat)):
-            mat[row][col] = t[row]
-    return mat
-
 # calculate the distance for 2 lists
 def dist4list(list1,list2):
     if len(list1) != len(list2):
@@ -140,29 +86,27 @@ def dist4list(list1,list2):
         return dist
 
 ###########################################################
-#
-#  start normalization for nested list
-# Author: find the code online, 
-# thanks her/his very much
-#
+
 ###########################################################        
 # LaTex：{x}_{normalization}=\frac{x-Min}{Max-Min}   min~max Normalization
-def zero_one_normalization(data,ncol):
-    res = data[:]
-    nrow = len(data)
-
-    for i in range(ncol): #each columns
-        maxx = max(data[x][i] for x in range(nrow))  #max in each columns
-        minx = min(data[x][i] for x in range(nrow))
-
-        if maxx - minx != 1.0:
-            for j in range(nrow): #row
-                res[j][i] = (data[j][i] - minx)/(maxx - minx)
-
-    return res
+def zero_one_normalization(matrix):
+    nrow,ncol = matrix.shape
+    for i in range(ncol):
+        max_value = np.max(matrix[:,i])
+        #print(matrix[:,i])
+        min_value = np.min(matrix[:,i])
+        #print(max_value,min_value)
+        if (max_value - min_value != 0):
+            for j in range(nrow):
+                matrix[j,i] = (float(matrix[j,i]) - min_value) / float(max_value - min_value)
+            #print(type(matrix[1,1]))
+            #print(matrix[:,i])
+            print("#######################")
+                
+    print(matrix)
 
 # LaTex：{x}_{normalization}=\frac{x-\mu }{\sigma }    sigma 标注话
-def Z_ScoreNormalization(data,ncol):
+def Z_ScoreNormalization(matrix):
     res = data[:]
     nrow = len(data)
 
@@ -177,27 +121,13 @@ def Z_ScoreNormalization(data,ncol):
 
     return res
 
-def log_Normalization(data,ncol):
-    res = data[:]
-    nrow = len(data)
+def log_Normalization(matrix):
+    return np.log10(matrix)
 
-    for i in range(ncol):
-        logg = max(data[x][i] for x in range(nrow))
-        if np.log10(logg) !=0:
-            for j in range(nrow): #横排
-                res[j][i] = np.log10(data[j][i]) / np.log10(logg)
 
-    return res
+def atan_Normalization(matrix):
+    return np.arctan(matrix) * 2 / np.pi
 
-def atan_Normalization(data,ncol):
-    res = data[:]
-    nrow = len(data)
-
-    for i in range(ncol):
-        for j in range(nrow): #横排
-            res[j][i] = np.arctan(data[j][i])*2 / np.pi
-
-    return res
 
 ###########################################################
 #
@@ -287,6 +217,37 @@ def createPlot(inTree):
     plt.show()
 
 
+###########################################################
+# add some method for normalisation  1. Min-max 2. z-score
 
+def min_max(alist,min1=0,max1=1):
+    min0 = min(alist)
+    max0 = max(alist)
 
+    for i in range(len(alist)):
+        alist[i] = min1+(alist[i]-min0)/(max0-min0)*(max1-min1)
+    return alist
 
+def z_score(alist):
+    x_mean= np.mean(alist)
+    x_sigma = np.square(np.var(alist))
+
+    for i in range(len(alist)):
+        alist[i] = (alist[i]-x_mean)/x_sigma
+    return alist
+
+def normalize4mat(mat):
+    '''
+    normalize for 2-d matrix
+    :param mat: matrix
+    :return: normalised matrix
+    '''
+    for col in range(len(mat)):
+        t = []
+        for row in range(len(mat[0])):
+            t.append(mat[row][col])
+
+        t = min_max(t)
+        for row in range(len(mat)):
+            mat[row][col] = t[row]
+    return mat
