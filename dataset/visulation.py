@@ -3,15 +3,28 @@ import pandas as pd
 from pandas.plotting import radviz,parallel_coordinates
 import matplotlib.pyplot as plt
 
-data = pd.read_csv("./wine.csv")
+data = pd.read_csv("./car.csv")
+col = data.columns
+print(col)
 
-plt.figure()
-parallel_coordinates(data,"1065")
-tk.save_img()
-plt.show()
+print(data.info())
+
+for i in col:
+    data[i]=pd.Categorical.from_array(data[i]).codes
+
+
+radviz(data,"rating")
 
 
 #car = pd.read_csv("./car.csv")
 #print(car)
 #car.plot(kind='box')
 #plt.show()
+
+import seaborn as sns
+
+sns.set()
+
+
+sns.pairplot(data,hue="rating")
+plt.show()

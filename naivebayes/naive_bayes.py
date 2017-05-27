@@ -144,12 +144,15 @@ class Naive_bayes(object):
         print(accuracy)
 
 
-attri, car = tk.readCsv("../dataset/car.csv")
+attri, car = tk.readCsv("../lenses.csv")
 
-train = car[:1200]
-test = car[1201:-1]
+train = car
+test = car
 #print(car)
-#print(test)
+#print(test# )
+for i in car.columns:
+    car[i] = car[i].astype("category")
+print(car.info())
 
 car_naive = Naive_bayes(train, attri,train)
 
