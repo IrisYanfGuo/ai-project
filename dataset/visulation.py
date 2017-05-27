@@ -3,7 +3,7 @@ import pandas as pd
 from pandas.plotting import radviz,parallel_coordinates
 import matplotlib.pyplot as plt
 
-data = pd.read_csv("./car.csv")
+data = pd.read_csv("../blood.csv")
 col = data.columns
 print(col)
 
@@ -13,7 +13,7 @@ for i in col:
     data[i]=pd.Categorical.from_array(data[i]).codes
 
 
-radviz(data,"rating")
+pd.scatter_matrix(data)
 
 
 #car = pd.read_csv("./car.csv")
@@ -26,5 +26,5 @@ import seaborn as sns
 sns.set()
 
 
-sns.pairplot(data,hue="rating")
+sns.pairplot(data,hue="donated_blood")
 plt.show()
