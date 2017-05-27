@@ -7,14 +7,39 @@
 import toolkit as tk 
 import numpy as np 
 from AI_kmeans import kmeans
-from AI_knn import knn
+import matplotlib.pyplot as plt
+
 
 attributes,instences = tk.readDataSet("iris.csv")
-attributes = list(attributes)
 
-#instences =  instences.tolist()
-#instences = tk.atan_Normalization(instences,len(attributes))
+#print(instences)
+instences = instences[:,:2]
+k = 4
+mykmeans = kmeans(attributes.tolist(),instences,k)
+cp,ct = mykmeans.getPrediction()
 
-mykmeans = kmeans(attributes,instences,3)
-mykmeans.getPrediction()
 
+numSamples, dim = np.shape(instences)
+
+for j in range(k):
+    print("cluster: ",j,end=" --> ")
+    print(cp[j,:])
+    for i in range(np.shape(instences)[0]):
+        index = int(ct[i,1])
+        if index==j:
+            print(instences[i,:])
+    print("\n##################\n")
+
+if (dim==2):
+	mark = ['or', 'ob', 'og', 'ok', '^r', '+r', 'sr', 'dr', '<r', 'pr']  
+	# draw all samples  
+	for i in range(numSamples):
+		markIndex = int(ct[i, 1])
+		plt.plot(instences[i, 0], instences[i, 1], mark[markIndex])  
+
+	mark = ['Dr', 'Db', 'Dg', 'Dk', '^b', '+b', 'sb', 'db', '<b', 'pb']  
+	# draw the centroids  
+	for i in range(k):
+		plt.plot(cp[i, 0], cp[i, 1], mark[i], markersize = 12)  
+
+	plt.show()  
