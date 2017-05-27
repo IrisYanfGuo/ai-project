@@ -1,7 +1,6 @@
 import time
 import matplotlib.pyplot as plt
 import numpy as np
-from io import BytesIO
 import pandas as pd
 
 # toolkit for project including File I/O, graphs

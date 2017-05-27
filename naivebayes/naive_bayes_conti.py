@@ -104,11 +104,9 @@ class Naive_bayes_conti(object):
             for j in range(len(self.__attributes) - 1):
                 pxc *= self._nor_distri(self.__pxc['mu'][i][j], self.__pxc['sigma'][i][j], blist[j])
                 px *= self._nor_distri(self.__px[j]['mu'], self.__px[j]['sigma'], blist[j])
-
             result[i] = pxc * self.__pc[i] / px
 
         largest = max(result.values())
-
         for i in self.__pc.keys():
             if result[i] == largest:
                 t = i
@@ -133,7 +131,7 @@ class Naive_bayes_conti(object):
         print(accuracy)
 
 
-attri, iris = tk.readCsv("../dataset/transfusion.csv")
+attri, iris = tk.readCsv("../balance-scale.csv")
 iris = iris.fillna(method='pad')
 print(iris)
 iris_naive = Naive_bayes_conti(iris, attri, iris)

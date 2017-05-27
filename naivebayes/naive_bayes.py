@@ -60,7 +60,7 @@ class Naive_bayes(object):
     def count_cat2(self,cat):
         colname = cat.columns
         dict = {}
-
+        print(cat)
         # initialize index
         for i in cat.index.levels[0]:
             dict_t1 = {}
@@ -70,9 +70,17 @@ class Naive_bayes(object):
             dict[i] = dict_t1
 
         for i in range(len(cat[colname[-1]])):
+            print("index",i)
+            print( type(cat[colname[-1]][i]))
+        print(cat.info())
+
+        print(cat[colname[-1]])
+
+        for i in range(len(cat[colname[-1]])):
             b = cat[colname[-1]].index[i]
             t = cat[colname[-1]][i]
             # 如果不存在,设初值为0.001
+            print(t)
             if (math.isnan(t)):
                 dict[b[0]][b[1]] = 0.001
             else:
@@ -144,14 +152,13 @@ class Naive_bayes(object):
         print(accuracy)
 
 
-attri, car = tk.readCsv("../lenses.csv")
+attri, car = tk.readCsv("../dataset/transfusion.csv")
 
 train = car
 test = car
 #print(car)
 #print(test# )
-for i in car.columns:
-    car[i] = car[i].astype("category")
+
 print(car.info())
 
 car_naive = Naive_bayes(train, attri,train)
