@@ -8,24 +8,25 @@ import toolkit as tk
 from AI_knn import knn
 import numpy as np
 
-attributes, instences = tk.readDataSet("dataset/iris.csv")
+attributes, instences = tk.readDataSet("blood.csv")
+#print(instences)
 attributes = list(attributes)
 
-instences = instences.tolist()
-
+instences = tk.Z_ScoreNormalization(instences,len(attributes))
+print(instences)
+#print(instences)
 
 lst = []
 for i in range(5):
-    trainSet, testSet = tk.splitDataSet(instences, 0.8)
-    myknn = knn()
-    myknn.training(attributes,trainSet)
-    acc,result = myknn.getPrediction(testSet,3)
-    lst.append(acc)
+	trainSet, testSet = tk.splitDataSet(instences, 0.8)
+	myknn = knn(attributes,trainSet.tolist())
+	acc,result = myknn.getPrediction(testSet.tolist(),3)
+	lst.append(acc)
 
 
 
-tk.draw_bar(lst)
+#tk.draw_bar(lst)
 
-# print(lst)
+print(lst)
 
-# print("mean = ",np.mean(lst),";std = ", np.std(lst))
+print("mean = ",np.mean(lst),";std = ", np.std(lst))

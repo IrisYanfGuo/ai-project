@@ -7,15 +7,13 @@ import numpy as np
 from operator import itemgetter
 import toolkit as tk 
 
-# no np.mat in this program
-
 class knn():
-    __attributes = []
-    __trainSet = []
 
     # read trainSet, testSet and "attributes" 
-    def __init__(self):
-        pass
+    def __init__(self,attributes,trainSet):
+        self.__attributes = attributes
+        self.__trainSet = trainSet
+        self.__training()
 
     # to calculate the Euclidean distance
     def __getEuclideanDistance(self, data1, data2):
@@ -25,7 +23,7 @@ class knn():
         return np.sqrt(d)
 
     # get K near neighborhoods
-    # 获取没有问题了, 字典会导致数据缺失
+    #  use list, because dictionay will cause value missing
     def __getKNearNeighbors(self, trainSet, testInstance, n=3):
         distances = []
         neighbors = []
@@ -50,14 +48,11 @@ class knn():
             dic.setdefault(response,dic.get(response,0)+1)
         temp = sorted(dic.items(),key=itemgetter(1))
         temp.reverse()
-        #最近的几个instances 来得到最大的结果, 值最大,说明靠的近,选大的
+        #choose the best one
         return temp[0][0]
 
 
-    def training(self,attributes,trainSet):
-        self.__attributes = attributes
-        self.__trainSet = trainSet
-
+    def __training(self):
         # this is for double check, because we need numeric
         for i in range(len(self.__trainSet)):
             for j in range(len(self.__attributes)):
@@ -86,19 +81,6 @@ class knn():
             Accuracy = correct/float(len(testSet)) *100.0
 
         return Accuracy,predictions
-##########################################################
 
-    def getResult(self):
-        return self.__predictions
-
-    def getAccuracy(self):
-        if (len(self.__testSet[0])<=len(self.__attributes)):
-            return ("getAccuracy() ERROR, len(testSet) < len(trainSet)")
-
-        correct = 0
-        for i in range(len(self.__testSet)):
-            if self.__testSet[i][-1] == self.__predictions[i]:
-                correct += 1
-        #print(correct)
         return (correct/float(len(self.__testSet))) *100.0
 

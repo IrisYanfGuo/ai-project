@@ -9,15 +9,12 @@ import numpy as np
 from AI_kmeans import kmeans
 from AI_knn import knn
 
-attributes,instences = tk.readDataSet("dataset/iris.csv")
+attributes,instences = tk.readDataSet("iris.csv")
 attributes = list(attributes)
 
-instences =  instences.tolist()
+#instences =  instences.tolist()
+#instences = tk.atan_Normalization(instences,len(attributes))
 
-#for this one, instences = trainSet + testSet
-#trainSet,testSet = tk.splitDataSet(instences,0.8)
-
-mykmeans = kmeans()
-mykmeans.training(attributes,instences,3)
+mykmeans = kmeans(attributes,instences,3)
 mykmeans.getPrediction()
 
