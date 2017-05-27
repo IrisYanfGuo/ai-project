@@ -1,7 +1,7 @@
 import toolkit as tk
 import pandas as pd
 import numpy as np
-
+from AI_knn import *
 
 # Leave one out procedure
 
@@ -18,14 +18,13 @@ def leave_1_ins(dataset, index):
     return ins, remain_dataset
 
 
-def cross_vali_dataset(dataset, cv=10):
+def cross_vali_split_data(dataset, cv=10):
     '''
 
     :param dataset: type matrix
     :param cv: the number of validation fold
     :return: K-1 length list contain the dataset
     '''
-    np.random.shuffle(dataset)
     # 向下取整
     size = int(np.floor(len(dataset) / cv))
     result = []
@@ -41,13 +40,66 @@ def cross_vali_dataset(dataset, cv=10):
     return result
 
 
+def accuracy_score(right, predict):
+    num = 0
+    for i in range(len(right)):
+        if right[i] == predict[i]:
+            num += 1
+    return num / len(right)
+
+
+def mcc(predict, right, stru):
+    TP, FP, FN, TN = 0, 0, 0, 0
+    for i in range(len(predict)):
+        if predict[i] == stru:
+            if right[i] == stru:
+                TP += 1
+            else:
+                FP += 1
+        else:
+            if right[i] == stru:
+                FN += 1
+            else:
+                if predict[i]==right[i]:
+                    TN += 1
+    print(TP,FP,FN,TN)
+    MCC = (TP * TN - FP * FN) / np.sqrt((TP + FP) * (TP + FN) * (TN + FP) * (TN + FN))
+    TRP = TP / (TP + FN)
+    SPC = TN / (FP + TN)
+
+    return MCC
+
+
+# test cross validation
 att, x = tk.readDataSet("./iris.csv")
-
-a = cross_vali_dataset(x, 16)
-
-# test part
+a = cross_vali_split_data(x, 16)
+right1 = x[:,-1]
+pre = []
 #for i in a:
- #   print(len(i[0]),len(i[1]))
- #   print()
-    # print()
-    # print(i)
+ #   res = knn(att,i[0])
+  #  for i in res.getPrediction(i[1])[1]:
+   #     pre.append(i)
+
+
+
+def cross(model,attr,dataset,cvfold=10):
+    np.random.shuffle(dataset)
+    right = dataset[:,-1]
+    train_test_pair_list = cross_vali_split_data(dataset,cvfold)
+    prediction = []
+    for train_test in train_test_pair_list:
+        mod = model(attr,train_test[0])
+        for i in mod.getPrediction(train_test[1])[1]:
+            prediction.append(i)
+    print(right)
+    print(prediction)
+    score = accuracy_score(right,prediction)
+    return score
+
+print(cross(knn,att,x,10))
+
+
+
+
+
+
