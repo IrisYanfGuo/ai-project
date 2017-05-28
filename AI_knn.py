@@ -82,5 +82,5 @@ class knn():
 
         return Accuracy,predictions
 
-        return (correct/float(len(self.__testSet))) *100.0
+
 
