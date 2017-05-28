@@ -125,3 +125,4 @@ print(car_naive.getPrediction(train))
 #car_naive2 = Naive_bayes("./txtfile/car_prepro.txt", 0.5)
 #car_naive2 = Naive_bayes("../car.txt", 0.5)
 '''
+

@@ -49,26 +49,24 @@ def accuracy_score(right, predict):
     return num / len(right)
 
 
-def mcc(predict, right, stru):
-    TP, FP, FN, TN = 0, 0, 0, 0
+def kappa(predict, right,classi):
+    a,b, c, d = 0, 0, 0, 0
     for i in range(len(predict)):
-        if predict[i] == stru:
-            if right[i] == stru:
-                TP += 1
+        if predict[i] == classi:
+            if right[i] == classi:
+                a += 1
             else:
-                FP += 1
+                b += 1
         else:
-            if right[i] == stru:
-                FN += 1
+            if right[i] == classi:
+                c += 1
             else:
                 if predict[i]==right[i]:
-                    TN += 1
-    print(TP,FP,FN,TN)
-    MCC = (TP * TN - FP * FN) / np.sqrt((TP + FP) * (TP + FN) * (TN + FP) * (TN + FN))
-    TRP = TP / (TP + FN)
-    SPC = TN / (FP + TN)
+                    d += 1
+    print(a,b,c,d)
+    kappa = ((a+d)/(a+b+c+d)-((a+c)*(a+b)+(b+d)*(c+d)))/(1-((a+c)*(a+b)+(b+d)*(c+d))/(a+b+c+d)^2)
 
-    return MCC
+    return kappa
 
 
 # test cross validation
@@ -98,14 +96,8 @@ def cross(model,attr,dataset,cvfold=10):
     return score
 
 
-'''
-dfiris = pd.read_csv("./iris.csv")
-col= dfiris.columns
-a= dfiris.sample(frac=1).reset_index()
 
-print(a)
 
-'''
 car_attr,car = tk.readDataSet("./car.csv")
 print(cross(Naive_bayes,car_attr,car))
 
