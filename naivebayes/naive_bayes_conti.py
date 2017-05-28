@@ -134,8 +134,3 @@ class Naive_bayes_conti(object):
         accuracy = self.getAccuracy(testset, predictions)
         return accuracy, predictions
 
-
-attr,iris = tk.readDataSet("../iris.csv")
-
-iris_naive = Naive_bayes_conti(attr,iris)
-print(iris_naive.getPrediction(iris))

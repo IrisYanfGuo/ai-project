@@ -5,6 +5,7 @@ from AI_knn import *
 from naivebayes.naive_bayes import *
 import seaborn as sns
 import matplotlib.pyplot as plt
+from naivebayes.naive_bayes_conti import *
 
 # Leave one out procedure
 
@@ -92,8 +93,6 @@ def cross(model,attr,dataset,cvfold=10):
         mod = model(attr,train_test[0])
         for i in mod.getPrediction(train_test[1])[1]:
             prediction.append(i)
-    print(right)
-    print(prediction)
     score = accuracy_score(right,prediction)
     k_value = kappa_dict(prediction,right)
     classi_map = classify_map(prediction,right)
@@ -130,14 +129,21 @@ def classify_map(predict,right):
         map_dict[i] = dict_t
     for i in range(len(right)):
         map_dict[right[i]][predict[i]]+=1
+    print(map_dict)
 
     map = pd.DataFrame(map_dict)
     return map
 
 car_attr,car = tk.readDataSet("./iris.csv")
-a,k_va,iris_map = cross(knn,car_attr,car)
+a,k_va,iris_map = cross(Naive_bayes_conti,car_attr,car)
 
-print(k_va)
-sns.heatmap(iris_map,annot=True)
-plt.show()
 
+
+
+def draw_map(map,xlab = "predict result",ylab="right "):
+    sns.heatmap(map,annot=True)
+    sns.plt.xlabel(xlab)
+    sns.plt.ylabel(ylab)
+    plt.show()
+
+draw_map(iris_map)
