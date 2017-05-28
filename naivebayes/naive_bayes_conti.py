@@ -41,7 +41,6 @@ class Naive_bayes_conti(object):
 
     def count(self, list):
         dict = {}
-
         dict['mu'] = mean(list)
         dict['sigma'] = var(list)
 

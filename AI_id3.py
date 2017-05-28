@@ -109,6 +109,7 @@ class id3(object):
         firstLabel = list(tree.keys())[0] # the name of first label
         secondDict = tree[firstLabel]   # the corresponding value
         attrIndex = self.__attributes.index(firstLabel) # attr 's index
+        classLabel = None
         for key in secondDict.keys():
             if data[attrIndex]==key:
                 if type(secondDict[key]).__name__=="dict":

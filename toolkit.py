@@ -36,8 +36,6 @@ def readCsv(filename):
     df_instances = csv
     return df_attritutes, df_instances
 
-
-
 #divide dataset(matrix) into training and testing dataset(matrix)
 def splitDataSet(matrix,split=0.66):
     dataSet = matrix.tolist()
@@ -85,6 +83,15 @@ def dist4list(list1,list2):
         for i in range(len(list1)):
             dist += np.sqrt((list1[i]-list2[i])**2)
         return dist
+
+def read_catgorical(filename):
+    attr,dataset = readCsv(filename)
+    cols = dataset.columns
+    for i in cols:
+        dataset[i] = pd.Categorical.from_array(dataset[i]).codes
+    dataset = dataset.as_matrix()
+    return attr,dataset
+
 
 ###########################################################
 
@@ -225,3 +232,4 @@ def createPlot(inTree):
 
 
 ###########################################################
+

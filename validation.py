@@ -9,21 +9,6 @@ from naivebayes.naive_bayes_conti import *
 from AI_id3 import *
 from time import time
 
-# Leave one out procedure
-
-# leave one out from dataset
-
-def leave_1_ins(dataset, index):
-    '''
-    pop the dataset[index] out
-    :param dataset: matrix
-    :return: (dataset, one sample)
-    '''
-    ins = dataset[index, :]
-    remain_dataset = np.delete(dataset, index, 0)
-    return ins, remain_dataset
-
-
 def cross_vali_split_data(dataset, cv=10):
     '''
 
@@ -187,20 +172,18 @@ def nice_print_model_info(accuracy,dict,kappa_score):
 
 
 
-
-
-
-
-
 # test Naive
-car_attr, car = tk.readDataSet("./lenses.csv")
-#acc, mcca, ka, map,t1,t2 = cross(Naive_bayes, car_attr, car)
+car_attr, car = tk.readDataSet("./dataset/car.csv")
+
+car_attr_num, car_num = tk.read_catgorical("./dataset/car.csv")
+#acc, mcca, ka, map,t1,t2 = cross(Nai, car_attr, car)
+#nice_print_model_info(acc,mcca,ka)
+#draw_map(map)
 
 
 
 
-
-# a comparison of Naive Bayes and Knn
+# a comparison of Naive Bayes and Knn and id3
 # test stability
 accu_list_naive =[]
 ka_list_naive = []
@@ -210,7 +193,7 @@ pre_time_naive = []
 
 
 for i in range(10):
-    acc,mcca,ka,map,t1,t2= cross(id3,car_attr,car)
+    acc,mcca,ka,map,t1,t2= cross(Naive_bayes,car_attr,car)
     accu_list_naive.append(acc)
     ka_list_naive.append(ka)
     train_time_naive.append(t1)
@@ -227,12 +210,29 @@ pre_time = []
 
 
 for i in range(10):
-    acc,mcca,ka,map,t1,t2= cross(knn,car_attr,car)
+    acc,mcca,ka,map,t1,t2= cross(knn,car_attr_num,car_num)
     accu_list.append(acc)
     ka_list.append(ka)
     train_time.append(t1)
     pre_time.append(t2)
 
-df = pd.DataFrame({"knn train time":train_time,"naive train time":train_time_naive})
+accu_list_id3 =[]
+ka_list_id3 = []
+train_time_id3= []
+pre_time_id3 = []
+
+
+
+for i in range(10):
+    acc,mcca,ka,map,t1,t2= cross(id3,car_attr,car)
+    accu_list_id3.append(acc)
+    ka_list_id3.append(ka)
+    train_time_id3.append(t1)
+    pre_time_id3.append(t2)
+
+
+
+df = pd.DataFrame({"knn train time":train_time,"naive bayes train time":train_time_naive,"id3 train time":train_time_id3})
 df.plot()
 plt.show()
+

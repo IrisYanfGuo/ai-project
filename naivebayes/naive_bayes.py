@@ -39,10 +39,9 @@ class Naive_bayes(object):
         dict = {}
         for i in list:
             if i not in dict.keys():
-                dict[i] = 1
+                dict[i] = 0.001
             else:
                 dict[i] += 1
-
         return dict
 
     def count_px(self):
@@ -68,11 +67,9 @@ class Naive_bayes(object):
             for j in range(len(self.__attributes)):
                 tdict = {}
                 for k in self.__px[j].keys():
-                    tdict[k] = 1
+                    tdict[k] = 0.001
                 t.append(tdict)
             self.__pxc[i] = t
-
-            # 初值为1, 防止不存在键的情况
 
         self.count_pxc()
 
@@ -86,9 +83,7 @@ class Naive_bayes(object):
                 px *= self.__px[j][blist[j]] / len(self.__trainSet)
 
             result[i] = pxc * self.__pc[i] / len(self.__trainSet) / px
-
         largest = max(result.values())
-
         for i in self.__pc.keys():
             if result[i] == largest:
                 t = i
@@ -99,7 +94,6 @@ class Naive_bayes(object):
         for i in range(len(testSet)):
             if testSet[i][-1] == predictions[i]:
                 correct += 1
-        # print(correct)
         return (correct / float(len(testSet))) * 100.0
 
     def getPrediction(self,testSet):
