@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 from AI_knn import *
 from naivebayes.naive_bayes import *
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 # Leave one out procedure
 
@@ -93,14 +95,9 @@ def cross(model,attr,dataset,cvfold=10):
     print(right)
     print(prediction)
     score = accuracy_score(right,prediction)
-    return score,right,prediction
-
-
-
-
-car_attr,car = tk.readDataSet("./car.csv")
-a,right,pre = cross(Naive_bayes,car_attr,car)
-
+    k_value = kappa_dict(prediction,right)
+    classi_map = classify_map(prediction,right)
+    return score,k_value,classi_map
 
 
 def kappa_dict(predict,right):
@@ -115,8 +112,6 @@ def kappa_dict(predict,right):
     for i in key_list:
         k_value[i] = kappa(predict,right,i)
     return k_value
-
-print(kappa_dict(pre,right))
 
 
 def classify_map(predict,right):
@@ -133,11 +128,16 @@ def classify_map(predict,right):
         for j in key_list:
             dict_t[j] = 0
         map_dict[i] = dict_t
-    for i in range
+    for i in range(len(right)):
+        map_dict[right[i]][predict[i]]+=1
 
     map = pd.DataFrame(map_dict)
     return map
 
-print(classify_map(pre,right))
+car_attr,car = tk.readDataSet("./iris.csv")
+a,k_va,iris_map = cross(knn,car_attr,car)
 
+print(k_va)
+sns.heatmap(iris_map,annot=True)
+plt.show()
 
