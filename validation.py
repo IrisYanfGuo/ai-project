@@ -193,7 +193,7 @@ def nice_print_model_info(accuracy,dict,kappa_score):
 
 
 # test Naive
-car_attr, car = tk.readDataSet("./iris.csv")
+car_attr, car = tk.readDataSet("./lenses.csv")
 #acc, mcca, ka, map,t1,t2 = cross(Naive_bayes, car_attr, car)
 
 
@@ -210,7 +210,7 @@ pre_time_naive = []
 
 
 for i in range(10):
-    acc,mcca,ka,map,t1,t2= cross(Naive_bayes_conti,car_attr,car)
+    acc,mcca,ka,map,t1,t2= cross(id3,car_attr,car)
     accu_list_naive.append(acc)
     ka_list_naive.append(ka)
     train_time_naive.append(t1)
