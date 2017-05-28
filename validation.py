@@ -186,22 +186,53 @@ def nice_print_model_info(accuracy,dict,kappa_score):
 
 
 
-car_attr, car = tk.readDataSet("./balance-scale.csv")
-acc, mcca, ka, map,t1,t2 = cross(knn, car_attr, car)
 
-print(acc)
+
+
+
+
+
+# test Naive
+car_attr, car = tk.readDataSet("./iris.csv")
+#acc, mcca, ka, map,t1,t2 = cross(Naive_bayes, car_attr, car)
+
+
+
+
+
+# a comparison of Naive Bayes and Knn
 # test stability
+accu_list_naive =[]
+ka_list_naive = []
+train_time_naive = []
+pre_time_naive = []
+
+
+
+for i in range(10):
+    acc,mcca,ka,map,t1,t2= cross(Naive_bayes_conti,car_attr,car)
+    accu_list_naive.append(acc)
+    ka_list_naive.append(ka)
+    train_time_naive.append(t1)
+    pre_time_naive.append(t2)
+
+
+
+
 accu_list =[]
 ka_list = []
+train_time = []
+pre_time = []
 
 
 
-for i in range(0):
-    acc,mcca,ka,map = cross(Naive_bayes,car_attr,car)
+for i in range(10):
+    acc,mcca,ka,map,t1,t2= cross(knn,car_attr,car)
     accu_list.append(acc)
     ka_list.append(ka)
+    train_time.append(t1)
+    pre_time.append(t2)
 
-
-
-print(t1)
-print(t2)
+df = pd.DataFrame({"knn train time":train_time,"naive train time":train_time_naive})
+df.plot()
+plt.show()
