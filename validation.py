@@ -7,7 +7,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from naivebayes.naive_bayes_conti import *
 from AI_id3 import *
-
+from time import time
 
 # Leave one out procedure
 
@@ -54,28 +54,33 @@ def accuracy_score(right, predict):
     return num / len(right)
 
 
-def kappa(predict, right, classi):
-    a, b, c, d = 0, 0, 0, 0
+def mcc(predict, right, classi):
+    TP, FP, FN, TN = 0, 0, 0, 0
     for i in range(len(predict)):
         if predict[i] == classi:
             if right[i] == classi:
-                a += 1
+                TP += 1
             else:
-                b += 1
+                FP += 1
         else:
             if right[i] == classi:
-                c += 1
+                FN += 1
             else:
                 if predict[i] == right[i]:
-                    d += 1
-    print(a, b, c, d)
-    kappa = ((a + d) / (a + b + c + d) - ((a + c) * (a + b) + (b + d) * (c + d)) / (a + b + c + d) ** 2) / (
-    1.0 - ((a + c) * (a + b) + (b + d) * (c + d)) / (a + b + c + d) ** 2)
-
-    return kappa
+                    TN += 1
+    MCC = (TP * TN - FP * FN) / np.sqrt((TP + FP) * (TP + FN) * (TN + FP) * (TN + FN)+0.0001)
 
 
-def kappa_dict(predict, right):
+    dict ={}
+    dict['MCC'] = MCC
+    dict['TP'] = TP
+    dict['FP'] = FP
+    return dict
+
+
+
+
+def MCC_TP_FP_dict(predict, right):
     key_list = []
     for i in right:
         if i in key_list:
@@ -83,32 +88,24 @@ def kappa_dict(predict, right):
         else:
             key_list.append(i)
 
-    k_value = {}
+    MCC_TP_FP = {}
     for i in key_list:
-        k_value[i] = kappa(predict, right, i)
-    return k_value
+        MCC_TP_FP[i] = mcc(predict, right, i)
+    return MCC_TP_FP
 
 
-def cross(model, attr, dataset, cvfold=10):
-    np.random.shuffle(dataset)
-    right = dataset[:, -1]
-    train_test_pair_list = cross_vali_split_data(dataset, cvfold)
-    prediction = []
-    if model == id3:
-        for train_test in train_test_pair_list:
-            mod = model(list(attr), (train_test[0]).tolist())
-            for i in mod.getPrediction(train_test[1].tolist())[1]:
-                prediction.append(i)
-    else:
-        for train_test in train_test_pair_list:
-            mod = model(attr, train_test[0])
-            for i in mod.getPrediction(train_test[1])[1]:
-                prediction.append(i)
+def kappa(mat):
+    total = sum(sum(mat))
 
-    score = accuracy_score(right, prediction)
-    k_value = kappa_dict(prediction, right)
-    classi_map = classify_map(prediction, right)
-    return score, k_value, classi_map
+    po = sum([mat[i][i] for i in range(len(mat))]) / total
+
+    pe = 0
+    for i in range(len(mat)):
+        pec = sum(mat[:, i]) * sum(mat[i, :]) / total ** 2
+        pe += pec
+
+    kappa_value = (po - pe) / (1 - pe)
+    return kappa_value
 
 
 def classify_map(predict, right):
@@ -127,10 +124,49 @@ def classify_map(predict, right):
         map_dict[i] = dict_t
     for i in range(len(right)):
         map_dict[right[i]][predict[i]] += 1
-    print(map_dict)
+
 
     map = pd.DataFrame(map_dict)
     return map
+
+
+def cross(model, attr, dataset, cvfold=10):
+    np.random.shuffle(dataset)
+    right = dataset[:, -1]
+    train_test_pair_list = cross_vali_split_data(dataset, cvfold)
+    prediction = []
+    train_time = 0
+    pre_time = 0
+    if model == id3:
+
+        for train_test in train_test_pair_list:
+            train_start = time()
+            mod = model(list(attr), (train_test[0]).tolist())
+            train_end = time()
+            train_time+= train_end -train_start
+            for i in mod.getPrediction(train_test[1].tolist())[1]:
+                prediction.append(i)
+            pre_end = time()
+            pre_time += pre_end- train_end
+    else:
+
+        for train_test in train_test_pair_list:
+            train_start = time()
+            mod = model(attr, train_test[0])
+            train_end = time()
+            train_time += train_end - train_start
+            for i in mod.getPrediction(train_test[1])[1]:
+                prediction.append(i)
+            pre_end = time()
+            pre_time += pre_end - train_end
+
+
+    accuracy = accuracy_score(right, prediction)
+    MCC_TP_FP = MCC_TP_FP_dict(prediction, right)
+    classi_map = classify_map(prediction, right)
+    kappa_score = kappa(classi_map.as_matrix())
+    return accuracy, MCC_TP_FP, kappa_score,classi_map,train_time,pre_time
+
 
 
 def draw_map(map, xlab="predict result", ylab="right "):
@@ -140,8 +176,32 @@ def draw_map(map, xlab="predict result", ylab="right "):
     plt.show()
 
 
-car_attr, car = tk.readDataSet("./iris.csv")
-a, k_va, iris_map = cross(knn, car_attr, car)
 
-draw_map(iris_map)
-print(k_va)
+
+def nice_print_model_info(accuracy,dict,kappa_score):
+    print("Kappa statistic: ",kappa_score)
+    print("Overall Accuracy: ",accuracy)
+    for i in dict.keys():
+        print(i,"  TP",dict[i]['TP'],"  FP",dict[i]['FP'],"  MCC",dict[i]['MCC'])
+
+
+
+car_attr, car = tk.readDataSet("./balance-scale.csv")
+acc, mcca, ka, map,t1,t2 = cross(knn, car_attr, car)
+
+print(acc)
+# test stability
+accu_list =[]
+ka_list = []
+
+
+
+for i in range(0):
+    acc,mcca,ka,map = cross(Naive_bayes,car_attr,car)
+    accu_list.append(acc)
+    ka_list.append(ka)
+
+
+
+print(t1)
+print(t2)
