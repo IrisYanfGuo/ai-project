@@ -4,43 +4,40 @@ from random import random
 from numpy import mean
 from numpy import var
 import toolkit as tk
-import pandas as pd
+
+
 
 
 # iris, continuous variables
 # car, discrete variables
 class Naive_bayes_conti(object):
-    def __init__(self, trainSet, attributes, testSet):
+
+
+    def __init__(self, attributes, trainset):
 
         self.__attributes = attributes
-
-        self.__trainSet = trainSet
-        self.__testSet = testSet
+        self.__trainSet = trainset
 
         self.__pc = {}
         self.__px = []
         self.__pxc = {}
-
         self.train()
-        self.getPrediction()
 
-    # divide dataset into training and testing dataset
-    def splitDataSet(self, split):
-        trainSet = []
-        testSet = []
-        for i in range(len(self.__instances)):
-            for j in range(len(self.__attributes)):
-                self.__instances[i][j] = float(self.__instances[i][j])
-        for x in range(len(self.__instances)):
-            if random() <= split:
-                trainSet.append(self.__instances[x])
-            else:
-                testSet.append(self.__instances[x])
-        return trainSet, testSet
 
     def getAttributes(self):
         return self.__attributes
         # get instances
+
+    def getInstances(self):
+        return self.__instances
+
+    def printTestset(self):
+        for i in self.__testSet:
+            print(i)
+
+    def printTrainset(self):
+        for i in self.__trainSet:
+            print(i)
 
     def count(self, list):
         dict = {}
@@ -51,8 +48,8 @@ class Naive_bayes_conti(object):
         return dict
 
     def count_px(self):
-        for i in self.__attributes[:-1]:
-            temp = self.__trainSet[i]
+        for i in range(len(self.__attributes)):
+            temp = self.__trainSet[:, i]
             tdict = self.count(temp)
             self.__px.append(tdict)
 
@@ -63,50 +60,57 @@ class Naive_bayes_conti(object):
                 dict[i] = 1
             else:
                 dict[i] += 1
-        for i in dict.keys():
-            dict[i] = dict[i] / len(list)
+
         return dict
 
     def count_pc(self):
-        tag = self.__trainSet[self.__attributes[-1]]
+        tag = self.__trainSet[:, -1]
         self.__pc = self.count2(tag)
 
-    def count_group(self, b):
-        dict = {}
-        for i in b.index:
-            dict_t = {}
-            for j in range(len(b.columns)):
-                dict_t[j] = b.loc[i][j]
-            dict[i] = dict_t
-        return dict
 
     def count_pxc(self):
-        group = self.__trainSet.groupby(self.__attributes[-1])
-        group_mean = group.mean()
-        group_var = group.var()
-        self.__pxc['mu'] = self.count_group(group_mean)
-        self.__pxc['sigma'] = self.count_group(group_var)
+        for i in self.__pc.keys():
+            t = []
+            for j in range(len(self.__trainSet)):
+                if self.__trainSet[j][-1] == i:
+                    t.append(self.__trainSet[j])
+            t2=[]
+            for k in range(len(t[0])-1):
+                t2.append(self.count([t[j][k] for j in range(len(t))]))
+
+            self.__pxc[i] = t2
+
+
 
     def train(self):
         self.count_px()
         self.count_pc()
         self.count_pxc()
 
-    def _nor_distri(self, mu, sigma, x):
 
-        return 1 / (math.sqrt(2 * math.pi) * sigma) * pow(math.e, -(x - mu) ** 2 / (2 * sigma ** 2))
+            # 初值为1, 防止不存在键的情况
+
+        self.count_pxc()
+
+    def _nor_distri(self,mu,sigma,x):
+
+        return 1/(math.sqrt(2*math.pi)*sigma)*pow(math.e,-(x-mu)**2/(2*sigma**2))
+
+
 
     def predict(self, blist):
         result = {}
         for i in self.__pc.keys():
             pxc = 1
             px = 1
-            for j in range(len(self.__attributes) - 1):
-                pxc *= self._nor_distri(self.__pxc['mu'][i][j], self.__pxc['sigma'][i][j], blist[j])
-                px *= self._nor_distri(self.__px[j]['mu'], self.__px[j]['sigma'], blist[j])
+            for j in range(len(self.__attributes)):
+                pxc *= self._nor_distri(self.__pxc[i][j]['mu'],self.__pxc[i][j]['sigma'],blist[j])
+                px *= self._nor_distri(self.__px[j]['mu'],self.__px[j]['sigma'],blist[j])
+
             result[i] = pxc * self.__pc[i] / px
 
         largest = max(result.values())
+
         for i in self.__pc.keys():
             if result[i] == largest:
                 t = i
@@ -115,37 +119,23 @@ class Naive_bayes_conti(object):
     def getAccuracy(self, testSet, predictions):
         correct = 0
         for i in range(len(testSet)):
-            if testSet.iloc[i][-1] == predictions[i]:
+            if testSet[i][-1] == predictions[i]:
                 correct += 1
         # print(correct)
         return (correct / float(len(testSet))) * 100.0
 
-    def getPrediction(self):
+    def getPrediction(self,testset):
         predictions = []
-        for i in range(len(self.__testSet)):
-            result = self.predict(self.__testSet.iloc[i])
+        for i in testset:
+            result = self.predict(i)
             predictions.append(result)
 
         # print(result)
-        accuracy = self.getAccuracy(self.__testSet, predictions)
-        print(accuracy)
+        accuracy = self.getAccuracy(testset, predictions)
+        return accuracy, predictions
 
 
-attri, iris = tk.readCsv("../balance-scale.csv")
-iris = iris.fillna(method='pad')
-print(iris)
-iris_naive = Naive_bayes_conti(iris, attri, iris)
-c = iris.groupby([attri[-1]]).var()
+attr,iris = tk.readDataSet("../iris.csv")
 
-
-def count_group(b):
-    dict = {}
-    for i in b.index:
-        dict_t = {}
-        for j in range(len(b.columns)):
-            dict_t[j] = b.loc[i][j]
-        dict[i] = dict_t
-    return dict
-
-
-print(count_group(c))
+iris_naive = Naive_bayes_conti(attr,iris)
+print(iris_naive.getPrediction(iris))

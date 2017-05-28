@@ -2,6 +2,7 @@ import toolkit as tk
 import pandas as pd
 import numpy as np
 from AI_knn import *
+from naivebayes.naive_bayes import *
 
 # Leave one out procedure
 
@@ -96,10 +97,17 @@ def cross(model,attr,dataset,cvfold=10):
     score = accuracy_score(right,prediction)
     return score
 
-print(cross(knn,att,x,10))
 
+'''
+dfiris = pd.read_csv("./iris.csv")
+col= dfiris.columns
+a= dfiris.sample(frac=1).reset_index()
 
+print(a)
 
+'''
+car_attr,car = tk.readDataSet("./car.csv")
+print(cross(Naive_bayes,car_attr,car))
 
 
 

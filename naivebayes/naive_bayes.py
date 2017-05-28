@@ -1,38 +1,24 @@
 import math
 import operator
-import pandas as pd
 from random import random
 import toolkit as tk
-import time
 
 
 # iris, continuous variables
 # car, discrete variables
 class Naive_bayes(object):
-    def __init__(self, trainSet, attributes,testSet):
 
-        self.__trainSet = trainSet
-        self.__attributes = attributes
 
-        self.__testSet = testSet
+    def __init__(self, attr,trainset):
+
+        self.__attributes = attr
+        self.__trainSet = trainset
 
         self.__pc = {}
         self.__px = []
-        self.__pxc = []
+        self.__pxc = {}
 
         self.train()
-        self.getPrediction()
-
-    # divide dataset into training and testing dataset
-    def splitDataSet(self, split):
-        trainSet = []
-        testSet = []
-        for x in range(len(self.__instances)):
-            if random() <= split:
-                trainSet.append(self.__instances[x])
-            else:
-                testSet.append(self.__instances[x])
-        return trainSet, testSet
 
     def getAttributes(self):
         return self.__attributes
@@ -49,82 +35,57 @@ class Naive_bayes(object):
         for i in self.__trainSet:
             print(i)
 
-    def count(self, cat):
+    def count(self, list):
         dict = {}
-        temp = cat.value_counts()
-        key = temp.index
-        for i in key:
-            dict[i] = temp[i]/len(cat)
-        return dict
-
-    def count_cat2(self,cat):
-        colname = cat.columns
-        dict = {}
-        print(cat)
-        # initialize index
-        for i in cat.index.levels[0]:
-            dict_t1 = {}
-            for j in cat.index.levels[1]:
-                dict_t1[j] = 0
-
-            dict[i] = dict_t1
-
-        for i in range(len(cat[colname[-1]])):
-            print("index",i)
-            print( type(cat[colname[-1]][i]))
-        print(cat.info())
-
-        print(cat[colname[-1]])
-
-        for i in range(len(cat[colname[-1]])):
-            b = cat[colname[-1]].index[i]
-            t = cat[colname[-1]][i]
-            # 如果不存在,设初值为0.001
-            print(t)
-            if (math.isnan(t)):
-                dict[b[0]][b[1]] = 0.001
+        for i in list:
+            if i not in dict.keys():
+                dict[i] = 1
             else:
-                dict[b[0]][b[1]] = t
+                dict[i] += 1
 
         return dict
 
     def count_px(self):
-        for i in self.__attributes[:-1]:
-            col_value = self.__trainSet[i]
-            t_dict = self.count(col_value)
-            self.__px.append(t_dict)
+        for i in range(len(self.__attributes)):
+            temp = self.__trainSet[:,i]
+            tdict = self.count(temp)
+            self.__px.append(tdict)
 
     def count_pc(self):
-        self.__pc = self.count(self.__trainSet[self.__attributes[-1]])
+        tag = self.__trainSet[:,-1]
+        self.__pc = self.count(tag)
 
     def count_pxc(self):
-        for i in self.__attributes[:-1]:
-            cat = self.__trainSet.groupby([self.__attributes[-1], i]).count()
-            dict_t = self.count_cat2(cat)
-            for i in dict_t.keys():
-                for j in dict_t[i].keys():
-                    dict_t[i][j] = dict_t[i][j]/(self.__pc[i]*len(self.__trainSet))
-            self.__pxc.append(dict_t)
+        for i in range(len(self.__trainSet)):
+            for j in range(len(self.__attributes)):
+                self.__pxc[self.__trainSet[i][-1]][j][self.__trainSet[i][j]] += 1
 
     def train(self):
-        self.count_pc()
         self.count_px()
+        self.count_pc()
+        for i in self.__pc.keys():
+            t = []
+            for j in range(len(self.__attributes)):
+                tdict = {}
+                for k in self.__px[j].keys():
+                    tdict[k] = 1
+                t.append(tdict)
+            self.__pxc[i] = t
+
+            # 初值为1, 防止不存在键的情况
+
         self.count_pxc()
-
-
-
-
 
     def predict(self, blist):
         result = {}
         for i in self.__pc.keys():
             pxc = 1
             px = 1
-            for j in range(len(self.__attributes)-1):
-                pxc *= self.__pxc[j][i][blist[j]]
-                px *= self.__px[j][blist[j]]
+            for j in range(len(self.__attributes)):
+                pxc *= self.__pxc[i][j][blist[j]] / self.__pc[i]
+                px *= self.__px[j][blist[j]] / len(self.__trainSet)
 
-            result[i] = pxc * self.__pc[i] / px
+            result[i] = pxc * self.__pc[i] / len(self.__trainSet) / px
 
         largest = max(result.values())
 
@@ -136,31 +97,31 @@ class Naive_bayes(object):
     def getAccuracy(self, testSet, predictions):
         correct = 0
         for i in range(len(testSet)):
-            if testSet.iloc[i][-1] == predictions[i]:
+            if testSet[i][-1] == predictions[i]:
                 correct += 1
         # print(correct)
         return (correct / float(len(testSet))) * 100.0
 
-    def getPrediction(self):
-        predictions = []
-        for i in range(len(self.__testSet)):
-            result = self.predict(self.__testSet.iloc[i])
-            predictions.append(result)
+    def getPrediction(self,testSet):
+        predicti = []
+        for i in testSet:
+            result = self.predict(i)
+            predicti.append(result)
 
         # print(result)
-        accuracy = self.getAccuracy(self.__testSet, predictions)
-        print(accuracy)
+        accuracy = self.getAccuracy(testSet, predicti)
+        return accuracy,predicti
+        #print(accuracy)
 
+'''
 
-attri, car = tk.readCsv("../dataset/transfusion.csv")
+attr, train = tk.readDataSet("../dataset/transfusion.csv")
 
-train = car
-test = car
-#print(car)
-#print(test# )
+print(train[:,-1])
 
-print(car.info())
+car_naive = Naive_bayes(attr,train)
+print(car_naive.getPrediction(train))
 
-car_naive = Naive_bayes(train, attri,train)
-
-#print(car.index)
+#car_naive2 = Naive_bayes("./txtfile/car_prepro.txt", 0.5)
+#car_naive2 = Naive_bayes("../car.txt", 0.5)
+'''
