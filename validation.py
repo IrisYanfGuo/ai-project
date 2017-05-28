@@ -64,7 +64,7 @@ def kappa(predict, right,classi):
                 if predict[i]==right[i]:
                     d += 1
     print(a,b,c,d)
-    kappa = ((a+d)/(a+b+c+d)-((a+c)*(a+b)+(b+d)*(c+d)))/(1-((a+c)*(a+b)+(b+d)*(c+d))/(a+b+c+d)^2)
+    kappa = ((a+d)/(a+b+c+d)-((a+c)*(a+b)+(b+d)*(c+d))/(a+b+c+d)**2)/(1.0-((a+c)*(a+b)+(b+d)*(c+d))/(a+b+c+d)**2)
 
     return kappa
 
@@ -93,13 +93,51 @@ def cross(model,attr,dataset,cvfold=10):
     print(right)
     print(prediction)
     score = accuracy_score(right,prediction)
-    return score
+    return score,right,prediction
 
 
 
 
 car_attr,car = tk.readDataSet("./car.csv")
-print(cross(Naive_bayes,car_attr,car))
+a,right,pre = cross(Naive_bayes,car_attr,car)
 
+
+
+def kappa_dict(predict,right):
+    key_list = []
+    for i in right:
+        if i in key_list:
+            pass
+        else:
+            key_list.append(i)
+
+    k_value = {}
+    for i in key_list:
+        k_value[i] = kappa(predict,right,i)
+    return k_value
+
+print(kappa_dict(pre,right))
+
+
+def classify_map(predict,right):
+    key_list = []
+    for i in right:
+        if i in key_list:
+            pass
+        else:
+            key_list.append(i)
+
+    map_dict = {}
+    for i in key_list:
+        dict_t ={}
+        for j in key_list:
+            dict_t[j] = 0
+        map_dict[i] = dict_t
+    for i in range
+
+    map = pd.DataFrame(map_dict)
+    return map
+
+print(classify_map(pre,right))
 
 
