@@ -9,18 +9,47 @@ import numpy as np
 from AI_kmeans import kmeans
 import matplotlib.pyplot as plt
 
-
 attributes,instences = tk.readDataSet("iris.csv")
+attributes = attributes.tolist()
+instences2 = instences[:,:len(attributes)]
+#instences2 = tk.zero_one_Normalization(instences2,len(attributes))
+#instences2 = tk.Z_ScoreNormalization(instences2,len(attributes))
 
-#print(instences)
-instences = instences[:,:2]
-k = 4
-mykmeans = kmeans(attributes.tolist(),instences,k)
-cp,ct = mykmeans.getPrediction()
+k = 3
+
+mykmeans = kmeans(attributes,instences2)
+cp,ct = mykmeans.getPrediction(k)
 
 
-numSamples, dim = np.shape(instences)
+numSamples, dim = np.shape(instences2)
 
+print("Final cluster centroids: ")
+
+for i in range(k):
+	min_dist = np.inf 
+	result = ""
+	count = 0
+	for j in range(np.shape(instences)[0]):
+		dist = np.sqrt(np.sum(np.power(cp[i,:]-instences2[j,:],2))) 
+		if min_dist > dist:
+			min_dist = dist
+			result = instences[j,np.shape(instences)[1]-1]
+		if (ct[j,1]==i):
+			count += 1
+	print(i,end=" ")
+	print(cp[i,:],end=" ")
+	print(count,end=" ")
+	print(result)
+
+print("SSE: ",end="")
+E = 0.0
+for i in range(k):
+	for j in range(np.shape(instences2)[0]):
+		if i == ct[j,1] :
+			#print(ct[j,0])
+			E += np.sum(np.power(instences2[int(ct[j,0]),:] - cp[i,:],2))
+print(E)
+'''
 for j in range(k):
     print("cluster: ",j,end=" --> ")
     print(cp[j,:])
@@ -29,6 +58,7 @@ for j in range(k):
         if index==j:
             print(instences[i,:])
     print("\n##################\n")
+'''
 
 if (dim==2):
 	mark = ['or', 'ob', 'og', 'ok', '^r', '+r', 'sr', 'dr', '<r', 'pr']  
