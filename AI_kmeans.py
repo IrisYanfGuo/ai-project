@@ -5,65 +5,72 @@
 # Created Time: 2017-05-19 10:34:20
 import toolkit
 import numpy as np
+import matplotlib.pyplot as plt
 
-# 这次不用 np.mat
 
 class kmeans(object):
     """docstring for kmeans"""
     # read trainSet, "attributes", and the number of cluster
-    def __init__(self,attributes,trainSet,k=2):
+    def __init__(self,attributes,trainSet,k=4):
         self.__predictions = []
         self.__k = k
         self.__attributes = attributes
         self.__trainSet = trainSet
-        self.__training()
+        #self.__training()
         
 
 
     def __getEuclideanDistance(self,data1,data2):
-        dd = 0.0
-        for i in range(len(self.__attributes)):
-            dd = dd + np.power(data1[i] - data2[i],2)
-        return np.sqrt(dd)
-
-    def __randomCentral(self):
-        cluster_lst = []
-        for i in range(self.__k):
-            cluster_lst.append([])
-        for i in range(self.__k):
-            index = round(np.random.rand()*len(self.__trainSet))
-            cluster_lst[i].append(self.__trainSet[index])
-        return cluster_lst
-
+        return np.sqrt(np.sum(np.power(data1 - data2, 2)))
 
     #print(np.random.rank(k))
     def __training(self):
-        for i in range(len(self.__trainSet)):
-            for j in range(len(self.__attributes)):
-                self.__trainSet[i][j] = float(self.__trainSet[i][j])
+        nrow, ncol = np.shape(self.__trainSet)
+        cluster_points = np.mat(np.zeros((self.__k,ncol)))
+        for j in range(ncol):
+            min_value = np.min(self.__trainSet[:,j])
+            max_value = np.max(self.__trainSet[:,j])
+            # find random cluster points, 
+            # add row by row
+            cluster_points[:,j] = min_value + (max_value-min_value)*np.random.rand(self.__k,1)
+        print(cluster_points)
+        
+        clusterTable = np.mat(np.zeros((nrow,3))) #record index, dist, cluster
+        for i in range(nrow):
+            clusterTable[i,0] = i
 
-        row,col = len(self.__trainSet)-1,len(self.__attributes)
-        cluster_lst = self.__randomCentral()
+        flag = True
 
-        for i in range(row):
-            minDist = np.inf
-            minIndex = 0
+        while flag:
+            flag = False
+            for i in range(nrow):
+                min_dist = np.inf 
+                min_index = -1
+                for j in range(self.__k):
+                    dist = self.__getEuclideanDistance(cluster_points[j,:],self.__trainSet[i,:])
+                    if dist < min_dist:
+                        min_dist = dist
+                        min_index = j
+                if clusterTable[i,1] != min_index:
+                    flag = True
+                    clusterTable[i,:] = i,min_index,np.power(min_dist,2)
 
-            for j in range(self.__k):
-                distance = self.__getEuclideanDistance(cluster_lst[j][0],self.__trainSet[i])
-                if distance < minDist:
-                    minDist = distance
-                    minIndex = j
+            for kk in range(self.__k):
+                new_cluster = np.mat(np.zeros((1,ncol)))
+                count = 0
+                for j in range(nrow):
+                    if (clusterTable[j,1]) == kk:
+                        count = count + 1
+                        new_cluster = new_cluster + self.__trainSet[j,:]
+                new_cluster = new_cluster / count
+                for r in range(ncol):
+                    cluster_points[kk,r] = new_cluster[0,r]
 
-            cluster_lst[minIndex].append(self.__trainSet[i])
-
-        self.__predictions = cluster_lst
+        return cluster_points,clusterTable
 
     def getPrediction(self):
-        for i in range(self.__k):
-            print("cluster "+str(i)+": ")
-            for j in range(len(self.__predictions[i])):
-                print(self.__predictions[i][j],end="\t")
-            print("\n##################\n")
+        cluster_points,clusterTable = self.__training()
+        return cluster_points,clusterTable
+        
 
 
