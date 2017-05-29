@@ -9,6 +9,7 @@ from naivebayes.naive_bayes_conti import *
 from AI_id3 import *
 from time import time
 
+
 def cross_vali_split_data(dataset, cv=10):
     '''
 
@@ -53,16 +54,13 @@ def mcc(predict, right, classi):
             else:
                 if predict[i] == right[i]:
                     TN += 1
-    MCC = (TP * TN - FP * FN) / np.sqrt((TP + FP) * (TP + FN) * (TN + FP) * (TN + FN)+0.0001)
+    MCC = (TP * TN - FP * FN) / np.sqrt((TP + FP) * (TP + FN) * (TN + FP) * (TN + FN) + 0.0001)
 
-
-    dict ={}
+    dict = {}
     dict['MCC'] = MCC
     dict['TP'] = TP
     dict['FP'] = FP
     return dict
-
-
 
 
 def MCC_TP_FP_dict(predict, right):
@@ -108,8 +106,8 @@ def classify_map(predict, right):
             dict_t[j] = 0
         map_dict[i] = dict_t
     for i in range(len(right)):
-        map_dict[right[i]][predict[i]] += 1
-
+        if (predict[i] != ""):
+            map_dict[right[i]][predict[i]] += 1
 
     map = pd.DataFrame(map_dict)
     return map
@@ -128,11 +126,11 @@ def cross(model, attr, dataset, cvfold=10):
             train_start = time()
             mod = model(list(attr), (train_test[0]).tolist())
             train_end = time()
-            train_time+= train_end -train_start
+            train_time += train_end - train_start
             for i in mod.getPrediction(train_test[1].tolist())[1]:
                 prediction.append(i)
             pre_end = time()
-            pre_time += pre_end- train_end
+            pre_time += pre_end - train_end
     else:
 
         for train_test in train_test_pair_list:
@@ -145,13 +143,11 @@ def cross(model, attr, dataset, cvfold=10):
             pre_end = time()
             pre_time += pre_end - train_end
 
-
     accuracy = accuracy_score(right, prediction)
     MCC_TP_FP = MCC_TP_FP_dict(prediction, right)
     classi_map = classify_map(prediction, right)
     kappa_score = kappa(classi_map.as_matrix())
-    return accuracy, MCC_TP_FP, kappa_score,classi_map,train_time,pre_time
-
+    return accuracy, MCC_TP_FP, kappa_score, classi_map, train_time, pre_time
 
 
 def draw_map(map, xlab="predict result", ylab="right "):
@@ -161,61 +157,55 @@ def draw_map(map, xlab="predict result", ylab="right "):
     plt.show()
 
 
-
-
-def nice_print_model_info(accuracy,dict,kappa_score):
-    print("Kappa statistic: ",kappa_score)
-    print("Overall Accuracy: ",accuracy)
+def nice_print_model_info(accuracy, dict, kappa_score):
+    print("Kappa statistic: ", kappa_score)
+    print("Overall Accuracy: ", accuracy)
     for i in dict.keys():
-        print(i,"  TP",dict[i]['TP'],"  FP",dict[i]['FP'],"  MCC",dict[i]['MCC'])
-
-
+        print(i, "  TP", dict[i]['TP'], "  FP", dict[i]['FP'], "  MCC", dict[i]['MCC'])
 
 
 # test Naive
-car_attr, car = tk.readDataSet("./dataset/car.csv")
+car_attr, car = tk.readDataSet("./dataset/iris.csv")
 
-car_attr_num, car_num = tk.read_catgorical("./dataset/car.csv")
-#acc, mcca, ka, map,t1,t2 = cross(Nai, car_attr, car)
-#nice_print_model_info(acc,mcca,ka)
-#draw_map(map)
+# car_attr_num, car_num = tk.read_catgorical("./dataset/car.csv")
+# acc, mcca, ka, map,t1,t2 = cross(Nai, car_attr, car)
+# nice_print_model_info(acc,mcca,ka)
+# draw_map(map)
 
 
 
 
 # a comparison of Naive Bayes and Knn and id3
 # test stability
-accu_list_naive =[]
+accu_list_naive = []
 ka_list_naive = []
 train_time_naive = []
 pre_time_naive = []
+mcc_list_naive = []
 
-
-
-for i in range(10):
-    acc,mcca,ka,map,t1,t2= cross(Naive_bayes,car_attr,car)
+for i in range(5):
+    acc, mcca, ka, map, t1, t2 = cross(Naive_bayes_conti, car_attr, car)
     accu_list_naive.append(acc)
     ka_list_naive.append(ka)
     train_time_naive.append(t1)
     pre_time_naive.append(t2)
+    mcc_list_naive.append(mcca)
 
-
-
-
-accu_list =[]
+accu_list = []
 ka_list = []
 train_time = []
 pre_time = []
+mcc_list = []
 
-
-
-for i in range(10):
-    acc,mcca,ka,map,t1,t2= cross(knn,car_attr_num,car_num)
+for i in range(5):
+    acc, mcca, ka, map, t1, t2 = cross(knn, car_attr, car)
     accu_list.append(acc)
     ka_list.append(ka)
+    mcc_list.append(mcca)
     train_time.append(t1)
     pre_time.append(t2)
 
+'''
 accu_list_id3 =[]
 ka_list_id3 = []
 train_time_id3= []
@@ -230,9 +220,37 @@ for i in range(10):
     train_time_id3.append(t1)
     pre_time_id3.append(t2)
 
+'''
 
-
-df = pd.DataFrame({"knn train time":train_time,"naive bayes train time":train_time_naive,"id3 train time":train_time_id3})
+'''
+df = pd.DataFrame(
+    {"knn train time": train_time, "naive bayes train time": train_time_naive, "knn predict time": pre_time,
+     "naive bayes predict time": pre_time_naive})
 df.plot()
+plt.xlabel("test index")
+plt.ylabel("time")
+plt.title("Time cost of knn and naive bayes")
 plt.show()
+'''
+
+df_accu = pd.DataFrame(
+    {"knn accuracy": accu_list, "naive bayes accuracy": accu_list_naive,"knn kappa:": ka_list, "naive bayes kappa": ka_list_naive})
+'''
+df_accu.plot.hist(alpha=0.7, bins=5)
+plt.xlabel("accuracy")
+plt.title("Accuracy of knn and naive bayes")
+plt.show()
+'''
+
+df_accu.plot(ylim=[0.5,1])
+plt.xlabel("test index")
+plt.ylabel("Evaluation of algorithms on iris dataset")
+plt.show()
+
+df_kappa = pd.DataFrame({"knn kappa:": ka_list, "naive bayes kappa": ka_list_naive})
+df_kappa.plot()
+plt.ylabel("Kappa Value on iris dataset")
+plt.xlabel("test index")
+plt.show()
+
 
